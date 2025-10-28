@@ -67,7 +67,12 @@ fun AppContent() {
     val hasSeenTutorial = remember { mutableStateOf(prefs.getBoolean("hasSeenTutorial", false)) }
 
     var currentScreen by remember { mutableStateOf("start") }
-    var selectedQuizModes by remember { mutableStateOf(setOf("All Excipients")) }
+    
+    val savedModes = remember { prefs.getStringSet("lastSelectedQuizModes", null) }
+    var selectedQuizModes by remember {
+        mutableStateOf(savedModes ?: setOf("Creams/ointments"))
+    }
+
     var selectedGameMode by remember { mutableStateOf(GameMode.TIME_ATTACK) }
     var selectedQuestionType by remember { mutableStateOf(PropertyType.NAME) }
     var selectedAnswerType by remember { mutableStateOf(PropertyType.STRUCTURE) }
@@ -111,6 +116,7 @@ fun AppContent() {
                 TutorialScreen(onComplete = {
                     prefs.edit().putBoolean("hasSeenTutorial", true).apply()
                     hasSeenTutorial.value = true
+                    currentScreen = "start" // Always go to start screen after tutorial
                 })
             } else {
                 when (currentScreen) {
@@ -141,7 +147,16 @@ fun AppContent() {
                         },
                         onBack = { currentScreen = "start" }
                     )
-                    "options" -> OptionsScreen(availableModes = quizModes, initialSelection = selectedQuizModes, onSave = { selectedQuizModes = it; currentScreen = "start" }, onBack = { currentScreen = "start" })
+                    "options" -> OptionsScreen(
+                        availableModes = quizModes,
+                        initialSelection = selectedQuizModes,
+                        onSave = { newModes ->
+                            selectedQuizModes = newModes
+                            prefs.edit().putStringSet("lastSelectedQuizModes", newModes).apply()
+                            currentScreen = "start"
+                        },
+                        onBack = { currentScreen = "start" }
+                    )
                     "achievements" -> AchievementsScreen(onBack = { currentScreen = "start" })
                     "encyclopedia" -> EncyclopediaScreen(listState = encyclopediaListState, onExcipientSelected = { selectedExcipient = it; currentScreen = "excipient_detail" }, onBack = { currentScreen = "start" })
                     "excipient_detail" -> selectedExcipient?.let { ExcipientDetailScreen(excipient = it, onBack = { currentScreen = "encyclopedia" }) }
