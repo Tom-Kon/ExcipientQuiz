@@ -30,7 +30,6 @@ object AchievementManager {
 
     // --- Game Completion Tracking ---
     private fun getCompletionKey(quizMode: String, gameMode: GameMode, qType: PropertyType, aType: PropertyType): String {
-        // Create a stable key by sorting the property names
         val sortedPair = listOf(qType.name, aType.name).sorted()
         return "completed_${gameMode.name}_${quizMode}_${sortedPair[0]}_${sortedPair[1]}"
     }
@@ -71,28 +70,39 @@ object AchievementManager {
         val quizMode = quizModes.first()
         if (quizMode == "All Excipients" || quizMode == "Other") return emptyList()
 
-        // 1. Mark the current game as completed
         markGameAsCompleted(context, gameMode, quizMode, qType, aType)
 
         val newlyUnlocked = mutableListOf<Achievement>()
 
-        // 2. Check if this completes the [Quiz Mode] Expert achievement
         val expertId = if (gameMode == GameMode.SURVIVAL) getSurvivalExpertId(quizMode) else getTimeAttackExpertId(quizMode)
         if (!isAchievementUnlocked(context, expertId)) {
             if (areAllPairsCompletedForMode(context, quizMode, gameMode)) {
                 unlockAchievement(context, expertId)
                 val name = "$quizMode ${if (gameMode == GameMode.SURVIVAL) "Survival" else "Timing"} Expert"
-                val desc = "Complete all Q&A pairs for $quizMode in ${gameMode.name.replace("_", " ")} mode."
-                newlyUnlocked.add(Achievement(expertId, name, desc, R.drawable.badge_survivalist))
+                newlyUnlocked.add(
+                    Achievement(
+                        id = expertId, 
+                        name = name, 
+                        descriptionResId = R.string.achievement_expert_desc, 
+                        descriptionFormatArgs = listOf(quizMode, gameMode.name.replace("_", " ")),
+                        imageRes = if (gameMode == GameMode.SURVIVAL) R.drawable.ic_survival else R.drawable.ic_time
+                    )
+                )
 
-                // 3. If a new Expert was unlocked, check if it completes the MEGA achievement
                 val megaId = if (gameMode == GameMode.SURVIVAL) SURVIVALIST else TIME_ATTACK_ACE
                 if (!isAchievementUnlocked(context, megaId)) {
                     if (areAllExpertAchievementsUnlocked(context, gameMode)) {
                         unlockAchievement(context, megaId)
                         val megaName = if (gameMode == GameMode.SURVIVAL) "Survivalist" else "Time Attack Ace"
-                        val megaDesc = "Achieve Expert status in all categories for ${gameMode.name.replace("_", " ")} mode."
-                        newlyUnlocked.add(Achievement(megaId, megaName, megaDesc, R.drawable.badge_time_attack_ace))
+                        val descId = if (gameMode == GameMode.SURVIVAL) R.string.achievement_survivalist_desc else R.string.achievement_time_attack_ace_desc
+                        newlyUnlocked.add(
+                            Achievement(
+                                id = megaId, 
+                                name = megaName, 
+                                descriptionResId = descId,
+                                imageRes = R.drawable.badge_time_attack_ace
+                            )
+                        )
                     }
                 }
             }

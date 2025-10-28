@@ -33,10 +33,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.excipientquiz.ui.theme.ExcipientQuizTheme
+import java.util.Locale
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        updateLocale(this)
         setContent {
             ExcipientQuizTheme {
                 AppContent()
@@ -57,6 +59,16 @@ class MainActivity : ComponentActivity() {
     override fun onDestroy() {
         super.onDestroy()
         SoundManager.stopBackgroundMusic()
+    }
+
+    private fun updateLocale(context: Context) {
+        val language = SettingsManager.getLanguage(context)
+        val locale = Locale(language)
+        Locale.setDefault(locale)
+        val resources = context.resources
+        val configuration = resources.configuration
+        configuration.setLocale(locale)
+        resources.updateConfiguration(configuration, resources.displayMetrics)
     }
 }
 
@@ -147,16 +159,10 @@ fun AppContent() {
                         },
                         onBack = { currentScreen = "start" }
                     )
-                    "options" -> OptionsScreen(
-                        availableModes = quizModes,
-                        initialSelection = selectedQuizModes,
-                        onSave = { newModes ->
-                            selectedQuizModes = newModes
-                            prefs.edit().putStringSet("lastSelectedQuizModes", newModes).apply()
-                            currentScreen = "start"
-                        },
-                        onBack = { currentScreen = "start" }
-                    )
+                    "options" -> OptionsScreen(availableModes = quizModes, initialSelection = selectedQuizModes, onSave = { newModes ->
+                        selectedQuizModes = newModes
+                        prefs.edit().putStringSet("lastSelectedQuizModes", newModes).apply()
+                        currentScreen = "start" }, onBack = { currentScreen = "start" })
                     "achievements" -> AchievementsScreen(onBack = { currentScreen = "start" })
                     "encyclopedia" -> EncyclopediaScreen(listState = encyclopediaListState, onExcipientSelected = { selectedExcipient = it; currentScreen = "excipient_detail" }, onBack = { currentScreen = "start" })
                     "excipient_detail" -> selectedExcipient?.let { ExcipientDetailScreen(excipient = it, onBack = { currentScreen = "encyclopedia" }) }

@@ -45,6 +45,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -116,10 +117,10 @@ fun ExcipientGameScreen(
     if (questions.isEmpty()) {
         Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text("No questions found for the selected modes.", textAlign = TextAlign.Center)
+                Text(stringResource(id = R.string.gamescreen_no_questions), textAlign = TextAlign.Center)
                 Spacer(modifier = Modifier.height(16.dp))
                 Button(onClick = onGameOver) {
-                    Text("Back to Main Menu")
+                    Text(stringResource(id = R.string.gamemode_button_back))
                 }
             }
         }
@@ -179,14 +180,14 @@ fun ExcipientGameScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Button(onClick = onGameOver) {
-                        Text("Back to main menu")
+                        Text(stringResource(id = R.string.common_back))
                     }
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text("Score: $score", fontSize = 20.sp)
+                        Text(stringResource(id = R.string.gamescreen_label_score, score), fontSize = 20.sp)
                         if (gameMode == GameMode.SURVIVAL) {
                             Spacer(modifier = Modifier.width(16.dp))
                             Text(
-                                text = "Timer: $survivalTimer",
+                                text = stringResource(id = R.string.gamescreen_label_timer, survivalTimer),
                                 fontSize = 20.sp,
                                 color = if (survivalTimer <= 3) Color.Red else Color.Unspecified
                             )
@@ -344,15 +345,15 @@ private fun ResultScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         if (isNewHighScore) {
-            Text("New high score!", fontSize = 36.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+            Text(stringResource(id = R.string.resultscreen_new_highscore), fontSize = 36.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
             Spacer(modifier = Modifier.height(16.dp))
         }
-        Text(if (gameMode == GameMode.TIME_ATTACK) "You got $score / $questionCount correct!" else "You got $score correct!", fontSize = 30.sp)
+        Text(if (gameMode == GameMode.TIME_ATTACK) stringResource(id = R.string.resultscreen_score_time_attack, score, questionCount) else stringResource(id = R.string.resultscreen_score_survival, score), fontSize = 30.sp)
         if (gameMode == GameMode.TIME_ATTACK) Text("Time: ${elapsedTime}s", fontSize = 24.sp)
         Spacer(modifier = Modifier.height(24.dp))
-        Text("Previous high score: $previousHighScoreString", fontSize = 16.sp)
+        Text(stringResource(id = R.string.resultscreen_previous_highscore, previousHighScoreString), fontSize = 16.sp)
         Spacer(modifier = Modifier.height(48.dp))
-        Button(onClick = onGameOver) { Text("Back to Start") }
+        Button(onClick = onGameOver) { Text(stringResource(id = R.string.resultscreen_button_back)) }
     }
 }
 
@@ -360,7 +361,7 @@ private fun ResultScreen(
 fun AchievementUnlockedDialog(achievements: List<Achievement>, onDismiss: () -> Unit) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Achievement${if (achievements.size > 1) "s" else ""} Unlocked!", fontWeight = FontWeight.Bold) },
+        title = { Text(if (achievements.size > 1) stringResource(id = R.string.dialog_achievement_title_multiple) else stringResource(id = R.string.dialog_achievement_title_single), fontWeight = FontWeight.Bold) },
         text = {
             Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
                 achievements.forEachIndexed { index, achievement ->
@@ -369,13 +370,17 @@ fun AchievementUnlockedDialog(achievements: List<Achievement>, onDismiss: () -> 
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(achievement.name, fontSize = 22.sp, fontWeight = FontWeight.SemiBold, textAlign = TextAlign.Center)
                     Spacer(modifier = Modifier.height(4.dp))
-                    Text(achievement.description, textAlign = TextAlign.Center, style = MaterialTheme.typography.bodySmall)
+                    Text(
+                        text = stringResource(id = achievement.descriptionResId, *achievement.descriptionFormatArgs.toTypedArray()),
+                        style = MaterialTheme.typography.bodySmall,
+                        textAlign = TextAlign.Center
+                    )
                 }
             }
         },
         confirmButton = {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-                Button(onClick = onDismiss) { Text("Awesome!") }
+                Button(onClick = onDismiss) { Text(stringResource(id = R.string.dialog_achievement_button)) }
             }
         }
     )
@@ -388,19 +393,19 @@ fun ProgressionUnlockedDialog(
     onDismiss: () -> Unit
 ) {
     val unlockedText = when (tier) {
-        ProgressionTier.ALTERNATIVE_NAMES -> "Alternative Names and Molecule Types"
-        ProgressionTier.FULLY_UNLOCKED -> "All"
+        ProgressionTier.ALTERNATIVE_NAMES -> stringResource(id = R.string.dialog_progression_tier2)
+        ProgressionTier.FULLY_UNLOCKED -> stringResource(id = R.string.dialog_progression_tier3)
         else -> ""
     }
 
     if (unlockedText.isNotEmpty()) {
         AlertDialog(
             onDismissRequest = onDismiss,
-            title = { Text("New Quizzes Unlocked!", fontWeight = FontWeight.Bold) },
-            text = { Text("You've unlocked the $unlockedText quizzes as well as the time attack mode for $quizMode!", textAlign = TextAlign.Center) },
+            title = { Text(stringResource(id = R.string.dialog_progression_title), fontWeight = FontWeight.Bold) },
+            text = { Text(stringResource(id = R.string.dialog_progression_body_time_attack, unlockedText, quizMode), textAlign = TextAlign.Center) },
             confirmButton = {
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-                    Button(onClick = onDismiss) { Text("Great!") }
+                    Button(onClick = onDismiss) { Text(stringResource(id = R.string.dialog_progression_button)) }
                 }
             }
         )
@@ -441,7 +446,7 @@ fun ImageTile(excipient: Excipient, isAnswered: Boolean, isSelected: Boolean, is
 @Composable
 private fun QuestionContent(questionType: PropertyType, answerType: PropertyType, excipient: Excipient) {
     Text(
-        text = "Which ${answerType.name.lowercase().replace("_", " ")} matches this ${questionType.name.lowercase().replace("_", " ")}?",
+        text = stringResource(id = R.string.gamescreen_question_prompt, answerType.name.lowercase().replace("_", " "), questionType.name.lowercase().replace("_", " ")),
         fontSize = 18.sp,
         textAlign = TextAlign.Center
     )

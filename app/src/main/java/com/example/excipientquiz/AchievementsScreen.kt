@@ -28,36 +28,40 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 
+// Redefined Achievement data class
 data class Achievement(
     val id: String,
-    val name: String,
-    val description: String,
+    val name: String, // Name remains a simple string
+    val descriptionResId: Int,
+    val descriptionFormatArgs: List<Any> = emptyList(),
     val imageRes: Int
-)
-
-val staticAchievements = listOf(
-    Achievement(
-        id = AchievementManager.TIME_ATTACK_ACE,
-        name = "Time Attack Ace",
-        description = "Achieve Timing Expert status in all quiz categories.",
-        imageRes = R.drawable.badge_time_attack_ace
-    ),
-    Achievement(
-        id = AchievementManager.SURVIVALIST,
-        name = "Survivalist",
-        description = "Achieve Survival Expert status in all quiz categories.",
-        imageRes = R.drawable.badge_survivalist
-    )
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AchievementsScreen(onBack: () -> Unit) {
     val context = LocalContext.current
+
+    // Updated achievement definitions
+    val staticAchievements = listOf(
+        Achievement(
+            id = AchievementManager.TIME_ATTACK_ACE,
+            name = "Time Attack Ace",
+            descriptionResId = R.string.achievement_time_attack_ace_desc,
+            imageRes = R.drawable.badge_time_attack_ace
+        ),
+        Achievement(
+            id = AchievementManager.SURVIVALIST,
+            name = "Survivalist",
+            descriptionResId = R.string.achievement_survivalist_desc,
+            imageRes = R.drawable.badge_survivalist
+        )
+    )
 
     val dynamicAchievements = quizModes.keys
         .filter { it != "All Excipients" && it != "Other" }
@@ -66,13 +70,15 @@ fun AchievementsScreen(onBack: () -> Unit) {
                 Achievement(
                     id = AchievementManager.getSurvivalExpertId(category),
                     name = "$category Survival Expert",
-                    description = "Complete all Q&A pairs for $category in Survival mode.",
+                    descriptionResId = R.string.achievement_expert_desc,
+                    descriptionFormatArgs = listOf(category, "Survival"),
                     imageRes = R.drawable.ic_survival
                 ),
                 Achievement(
                     id = AchievementManager.getTimeAttackExpertId(category),
                     name = "$category Timing Expert",
-                    description = "Complete all Q&A pairs for $category in Time Attack mode.",
+                    descriptionResId = R.string.achievement_expert_desc,
+                    descriptionFormatArgs = listOf(category, "Time Attack"),
                     imageRes = R.drawable.ic_time
                 )
             )
@@ -83,7 +89,7 @@ fun AchievementsScreen(onBack: () -> Unit) {
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text("Achievements") },
+                title = { Text(stringResource(id = R.string.achievements_title)) },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
                     containerColor = Color.Transparent
                 )
@@ -97,7 +103,7 @@ fun AchievementsScreen(onBack: () -> Unit) {
                 contentAlignment = Alignment.Center
             ) {
                 Button(onClick = onBack) {
-                    Text("Back")
+                    Text(stringResource(id = R.string.common_back))
                 }
             }
         }
@@ -138,7 +144,12 @@ fun AchievementCard(achievement: Achievement, isUnlocked: Boolean) {
             Spacer(modifier = Modifier.height(8.dp))
             Text(text = achievement.name, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
             Spacer(modifier = Modifier.height(4.dp))
-            Text(text = achievement.description, style = MaterialTheme.typography.bodySmall, textAlign = TextAlign.Center)
+            // Correctly resolve string resource here
+            Text(
+                text = stringResource(id = achievement.descriptionResId, *achievement.descriptionFormatArgs.toTypedArray()),
+                style = MaterialTheme.typography.bodySmall, 
+                textAlign = TextAlign.Center
+            )
         }
     }
 }

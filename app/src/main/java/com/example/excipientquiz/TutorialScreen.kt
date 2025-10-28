@@ -14,6 +14,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 
@@ -28,28 +29,28 @@ fun TutorialScreen(onComplete: () -> Unit) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "Welcome to the Pharmaceutical Excipient Quiz!",
+            text = stringResource(id = R.string.tutorial_welcome_title),
             style = MaterialTheme.typography.headlineLarge,
             textAlign = TextAlign.Center
         )
         Spacer(modifier = Modifier.height(32.dp))
 
         Text(
-            text = "Your goal in this game is to master pharmaceutical excipients. This includes their names and alternative names, their structures, their functions, and even more!",
+            text = stringResource(id = R.string.tutorial_goal),
             style = MaterialTheme.typography.bodyLarge,
             textAlign = TextAlign.Justify
         )
         Spacer(modifier = Modifier.height(24.dp))
 
         Text(
-            text = "Many game modes start out by being locked at first. Unlock game modes by completing quizzes in survival mode! You can select what excipients you want to play the quiz with via the quiz content button. When you complete individual categories, you can combine them and play with more excipients at once! If you forgot what is unlocked and what isn't, check out the progression button.",
+            text = stringResource(id = R.string.tutorial_progression),
             style = MaterialTheme.typography.bodyLarge,
             textAlign = TextAlign.Justify
         )
         Spacer(modifier = Modifier.height(24.dp))
 
         Text(
-            text = "Once you're comfortable with survival and have unlocked the time attack mode, test your speed to set new high scores!",
+            text = stringResource(id = R.string.tutorial_time_attack),
             style = MaterialTheme.typography.bodyLarge,
             textAlign = TextAlign.Justify
         )
@@ -57,7 +58,7 @@ fun TutorialScreen(onComplete: () -> Unit) {
         Spacer(modifier = Modifier.height(24.dp))
 
         Text(
-            text = "Be sure to check out the achievements you can earn in the achievements tab. Furthermore, the encyclopedia contains a lot of additional information about all of the excipients in the game.",
+            text = stringResource(id = R.string.tutorial_extra),
             style = MaterialTheme.typography.bodyLarge,
             textAlign = TextAlign.Justify
         )
@@ -65,7 +66,7 @@ fun TutorialScreen(onComplete: () -> Unit) {
         Spacer(modifier = Modifier.height(24.dp))
 
         Button(onClick = onComplete) {
-            Text("Let's Go!")
+            Text(stringResource(id = R.string.tutorial_button_start))
         }
     }
 }

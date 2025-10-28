@@ -36,6 +36,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -60,8 +61,9 @@ fun ExcipientGameStartScreen(
     val propertyTypes = PropertyType.values()
 
     val isPairValid = questionType != answerType
-    val isPlayable = ProgressionManager.isPlayable(context, selectedQuizModes, questionType, answerType, GameMode.SURVIVAL) ||
+    val isPlayable = ProgressionManager.isPlayable(context, selectedQuizModes, questionType, answerType, GameMode.SURVIVAL) || 
                      ProgressionManager.isPlayable(context, selectedQuizModes, questionType, answerType, GameMode.TIME_ATTACK)
+
 
     fun updateQuestionType(offset: Int) {
         val newIndex = (propertyTypes.indexOf(questionType) + offset + propertyTypes.size) % propertyTypes.size
@@ -83,19 +85,19 @@ fun ExcipientGameStartScreen(
         Spacer(modifier = Modifier.height(56.dp))
 
         Text(
-            text = "The Pharmaceutical Excipient Quiz \uD83D\uDC8A",
+            text = stringResource(id = R.string.start_title),
             style = MaterialTheme.typography.headlineLarge,
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(horizontal = 16.dp)
         )
         Spacer(modifier = Modifier.height(48.dp))
 
-        Text("QUESTION", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+        Text(stringResource(id = R.string.start_label_question), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
         PropertySelector(property = questionType, onPrevious = { updateQuestionType(-1) }, onNext = { updateQuestionType(1) }, isLocked = !isPlayable)
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        Text("ANSWER", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+        Text(stringResource(id = R.string.start_label_answer), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
         PropertySelector(property = answerType, onPrevious = { updateAnswerType(-1) }, onNext = { updateAnswerType(1) }, isLocked = !isPlayable)
 
         Spacer(modifier = Modifier.height(30.dp))
@@ -104,7 +106,7 @@ fun ExcipientGameStartScreen(
             onClick = onStartChallenge,
             enabled = isPlayable && isPairValid
         ) {
-            Text("Start Challenge", fontSize = 18.sp)
+            Text(stringResource(id = R.string.start_button_challenge), fontSize = 18.sp)
         }
 
         Spacer(modifier = Modifier.height(56.dp))
@@ -112,15 +114,15 @@ fun ExcipientGameStartScreen(
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Row {
                 Button(onClick = onShowOptions) {
-                    Text("Quiz Content")
+                    Text(stringResource(id = R.string.start_button_options))
                 }
                 Spacer(modifier = Modifier.width(16.dp))
                 Button(onClick = onShowProgression) {
-                    Text("Progression")
+                    Text(stringResource(id = R.string.start_button_progression))
                 }
             }
             Text(
-                text = "Current quiz content: ${selectedQuizModes.joinToString()}",
+                text = stringResource(id = R.string.start_label_active_modes, selectedQuizModes.joinToString()),
                 style = MaterialTheme.typography.bodySmall,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(top = 4.dp)
@@ -128,11 +130,11 @@ fun ExcipientGameStartScreen(
             Spacer(modifier = Modifier.height(16.dp))
             Row(modifier = Modifier.padding(bottom = 25.dp)) {
                 Button(onClick = onShowAchievements) {
-                    Text("Achievements")
+                    Text(stringResource(id = R.string.start_button_achievements))
                 }
                 Spacer(modifier = Modifier.width(16.dp))
                 Button(onClick = onShowEncyclopedia) {
-                    Text("Encyclopedia")
+                    Text(stringResource(id = R.string.start_button_encyclopedia))
                 }
             }
         }
@@ -187,7 +189,7 @@ fun PropertySelector(property: PropertyType, onPrevious: () -> Unit, onNext: () 
                     modifier = Modifier.alpha(if (isLocked) 0.5f else 1f).padding(vertical = 8.dp)
                 ) {
                     if (isLocked) {
-                        Icon(Icons.Default.Lock, contentDescription = "Locked", modifier = Modifier.size(24.dp))
+                        Icon(Icons.Default.Lock, contentDescription = stringResource(id = R.string.common_locked), modifier = Modifier.size(24.dp))
                         Spacer(modifier = Modifier.width(8.dp))
                     }
                     Text(

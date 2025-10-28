@@ -19,6 +19,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 
 @Composable
@@ -37,7 +38,7 @@ fun OptionsScreen(
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text("Select Quiz Content", style = MaterialTheme.typography.headlineMedium)
+        Text(stringResource(id = R.string.options_title), style = MaterialTheme.typography.headlineMedium)
         Spacer(modifier = Modifier.height(16.dp))
 
         LazyColumn(modifier = Modifier.weight(1f)) {
@@ -49,20 +50,16 @@ fun OptionsScreen(
                             val currentSelection = selectedModes.value.toMutableSet()
 
                             if (mode == allExcipientsMode) {
-                                // If "All" is clicked, it becomes the only selection
                                 selectedModes.value = setOf(allExcipientsMode)
                             } else {
-                                // If another item is clicked, "All" is deselected
                                 currentSelection.remove(allExcipientsMode)
                                 
-                                // Toggle the clicked item
                                 if (currentSelection.contains(mode)) {
                                     currentSelection.remove(mode)
                                 } else {
                                     currentSelection.add(mode)
                                 }
 
-                                // If nothing is left, default back to "All"
                                 if (currentSelection.isEmpty()) {
                                     selectedModes.value = setOf(allExcipientsMode)
                                 } else {
@@ -75,7 +72,7 @@ fun OptionsScreen(
                 ) {
                     Checkbox(
                         checked = selectedModes.value.contains(mode),
-                        onCheckedChange = null // Handled by the Row's clickable
+                        onCheckedChange = null
                     )
                     Text(text = mode, modifier = Modifier.padding(start = 16.dp))
                 }
@@ -86,10 +83,10 @@ fun OptionsScreen(
 
         Row {
             Button(onClick = onBack, modifier = Modifier.padding(end = 8.dp)) {
-                Text("Back")
+                Text(stringResource(id = R.string.common_back))
             }
             Button(onClick = { onSave(selectedModes.value) }) {
-                Text("Save")
+                Text(stringResource(id = R.string.options_button_save))
             }
         }
     }

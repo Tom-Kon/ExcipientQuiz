@@ -1,0 +1,83 @@
+<resources>
+    <string name="app_name">Hulpstoffen Quiz</string>
+
+
+    <!-- Tutorial Screen -->
+    <string name="tutorial_welcome_title">Welkom bij de Farmaceutische Hulpstoffen Quiz!</string>
+    <string name="tutorial_goal">Je doel in dit spel is om farmaceutische hulpstoffen onder de knie te krijgen. Dit omvat hun namen en alternatieve namen, hun structuren, hun functies en zelfs meer!</string>
+    <string name="tutorial_progression">Veel spelmodi zijn in het begin vergrendeld. Ontgrendel spelmodi door quizzen te voltooien in de overlevingsmodus! Je kunt selecteren met welke hulpstoffen je de quiz wilt spelen via de knop \'Quiz-inhoud\'. Wanneer je individuele categorieën voltooit, kun je ze combineren en met steeds meer hulpstoffen tegelijk spelen! Als je bent vergeten wat ontgrendeld is en wat niet, bekijk dan de voortgangsknop.</string>
+    <string name="tutorial_time_attack">Zodra je vertrouwd bent met de overlevingsmodus en de tijdsaanvalmodus hebt ontgrendeld, test je je snelheid om nieuwe topscores te vestigen!</string>
+    <string name="tutorial_extra">Zorg ervoor dat je de prestaties bekijkt die je kunt verdienen op het prestaties-tabblad. Verder bevat de encyclopedie veel aanvullende informatie over alle hulpstoffen in het spel.</string>
+    <string name="tutorial_button_start">Laten we gaan!</string>
+
+    <!-- Settings Screen -->
+    <string name="settings_title">Instellingen</string>
+    <string name="settings_music">Achtergrondmuziek</string>
+    <string name="settings_sfx">Geluidseffecten</string>
+    <string name="settings_show_tutorial">Toon uitleg opnieuw</string>
+    <string name="settings_language">Taal</string>
+    <string name="settings_language_en">Engels</string>
+    <string name="settings_language_nl">Nederlands</string>
+
+    <!-- Start Screen -->
+    <string name="start_title">De Farmaceutische Hulpstoffen Quiz 💊</string>
+    <string name="start_button_challenge">Start Uitdaging</string>
+    <string name="start_button_options">Quiz-inhoud</string>
+    <string name="start_button_progression">Voortgang</string>
+    <string name="start_button_achievements">Prestaties</string>
+    <string name="start_button_encyclopedia">Encyclopedie</string>
+    <string name="start_label_active_modes">Actief: %s</string>
+    <string name="start_label_question">VRAAG</string>
+    <string name="start_label_answer">ANTWOORD</string>
+
+    <!-- Game Mode Selection -->
+    <string name="gamemode_title">Kies je modus</string>
+    <string name="gamemode_time_attack">Tijdaanval</string>
+    <string name="gamemode_survival">Overleving</string>
+    <string name="gamemode_button_back">Terug naar hoofdmenu</string>
+
+    <!-- Game Screen -->
+    <string name="gamescreen_label_score">Score: %d</string>
+    <string name="gamescreen_label_timer">Tijd: %d</string>
+    <string name="gamescreen_no_questions">Geen vragen gevonden voor de geselecteerde modi.</string>
+    <string name="gamescreen_question_prompt">Welke %s hoort bij deze %s?</string>
+
+    <!-- Result Screen -->
+    <string name="resultscreen_new_highscore">Nieuwe topscore!</string>
+    <string name="resultscreen_score_time_attack">Je had %d / %d goed!</string>
+    <string name="resultscreen_score_survival">Je hebt %d goed!</string>
+    <string name="resultscreen_previous_highscore">Vorige topscore: %s</string>
+    <string name="resultscreen_label_none">geen</string>
+    <string name="resultscreen_button_back">Terug naar start</string>
+
+    <!-- Progression Screen -->
+    <string name="progression_title">Voortgangsstatus</string>
+    <string name="progression_tier2">Niveau 2</string>
+    <string name="progression_all">Alles</string>
+
+    <!-- Options Screen -->
+    <string name="options_title">Selecteer Quiz-inhoud</string>
+    <string name="options_button_save">Opslaan</string>
+
+    <!-- Achievements Screen -->
+    <string name="achievements_title">Prestaties</string>
+    <string name="achievement_time_attack_ace_desc">Behaal de status van Timing Expert in alle quizcategorieën.</string>
+    <string name="achievement_survivalist_desc">Behaal de status van Overlevingsexpert in alle quizcategorieën.</string>
+    <string name="achievement_expert_desc">Voltooi alle V&amp;A-paren voor %s in de %s-modus.</string>
+
+    <!-- Dialogs -->
+    <string name="dialog_achievement_title_single">Prestatie ontgrendeld!</string>
+    <string name="dialog_achievement_title_multiple">Prestaties ontgrendeld!</string>
+    <string name="dialog_achievement_button">Geweldig!</string>
+    <string name="dialog_progression_title">Nieuwe quizzen ontgrendeld!</string>
+    <string name="dialog_progression_body">Je hebt de %s quizzen voor %s ontgrendeld!</string>
+    <string name="dialog_progression_body_time_attack">Je hebt de %s quizzen en de tijdsaanvalmodus voor %s ontgrendeld!</string>
+    <string name="dialog_progression_tier2">Alternatieve Namen en Molecuultypes</string>
+    <string name="dialog_progression_tier3">Alle</string>
+    <string name="dialog_progression_button">Super!</string>
+
+    <!-- Common -->
+    <string name="common_back">Terug</string>
+    <string name="common_locked">Vergrendeld</string>
+
+</resources>
