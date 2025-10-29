@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Excipient Quiz</string>
+    <string name="app_name" translatable="false">Excipient Quiz</string>
 
     <!-- Tutorial Screen -->
     <string name="tutorial_welcome_title">Welcome to the Pharmaceutical Excipient Quiz!</string>
@@ -16,7 +16,10 @@
     <string name="settings_show_tutorial">Show Tutorial Again</string>
     <string name="settings_language">Language</string>
     <string name="settings_language_en">English</string>
+    <string name="settings_language_fr">French</string>
     <string name="settings_language_nl">Dutch</string>
+    <string name="settings_language_de">German</string>
+
 
     <!-- Start Screen -->
     <string name="start_title">The Pharmaceutical Excipient Quiz 💊</string>

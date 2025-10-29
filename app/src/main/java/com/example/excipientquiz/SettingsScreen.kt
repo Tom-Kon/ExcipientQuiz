@@ -32,6 +32,15 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import java.util.Locale
 
+private data class LanguageOption(val code: String, val nameResId: Int, val flagEmoji: String)
+
+private val languages = listOf(
+    LanguageOption("en", R.string.settings_language_en, "🇬🇧"),
+    LanguageOption("nl", R.string.settings_language_nl, "🇳🇱"),
+    LanguageOption("fr", R.string.settings_language_fr, "🇫🇷"),
+    LanguageOption("de", R.string.settings_language_de, "🇩🇪")
+)
+
 @Composable
 fun SettingsScreen(onBack: () -> Unit, onShowTutorial: () -> Unit) {
     val context = LocalContext.current
@@ -40,7 +49,7 @@ fun SettingsScreen(onBack: () -> Unit, onShowTutorial: () -> Unit) {
     val musicEnabled = remember { mutableStateOf(SettingsManager.isMusicEnabled(context)) }
     val sfxEnabled = remember { mutableStateOf(SettingsManager.isSfxEnabled(context)) }
     var languageMenuExpanded by remember { mutableStateOf(false) }
-    val currentLanguage = remember { mutableStateOf(SettingsManager.getLanguage(context)) }
+    val currentLanguageCode = remember { mutableStateOf(SettingsManager.getLanguage(context)) }
 
     fun setLocale(languageCode: String) {
         val locale = Locale(languageCode)
@@ -50,7 +59,6 @@ fun SettingsScreen(onBack: () -> Unit, onShowTutorial: () -> Unit) {
         configuration.setLocale(locale)
         resources.updateConfiguration(configuration, resources.displayMetrics)
         SettingsManager.setLanguage(context, languageCode)
-        // Restart the activity to apply the new language
         activity?.recreate()
     }
 
@@ -83,14 +91,23 @@ fun SettingsScreen(onBack: () -> Unit, onShowTutorial: () -> Unit) {
             Text(stringResource(id = R.string.settings_language), style = MaterialTheme.typography.bodyLarge)
             Box(modifier = Modifier.wrapContentSize(Alignment.TopStart)) {
                 TextButton(onClick = { languageMenuExpanded = true }) {
-                    Text(if (currentLanguage.value == "nl") stringResource(id = R.string.settings_language_nl) else stringResource(id = R.string.settings_language_en))
+                    val currentLanguage = languages.find { it.code == currentLanguageCode.value } ?: languages.first()
+                    Text("${currentLanguage.flagEmoji} ${stringResource(id = currentLanguage.nameResId)}")
                 }
                 DropdownMenu(
                     expanded = languageMenuExpanded,
                     onDismissRequest = { languageMenuExpanded = false }
                 ) {
-                    DropdownMenuItem(text = { Text(stringResource(id = R.string.settings_language_en)) }, onClick = { setLocale("en"); languageMenuExpanded = false })
-                    DropdownMenuItem(text = { Text(stringResource(id = R.string.settings_language_nl)) }, onClick = { setLocale("nl"); languageMenuExpanded = false })
+                    languages.forEach { lang ->
+                        DropdownMenuItem(
+                            text = { Text("${lang.flagEmoji} ${stringResource(id = lang.nameResId)}") },
+                            onClick = { 
+                                setLocale(lang.code)
+                                currentLanguageCode.value = lang.code
+                                languageMenuExpanded = false 
+                            }
+                        )
+                    }
                 }
             }
         }
