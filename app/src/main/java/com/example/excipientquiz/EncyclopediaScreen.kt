@@ -33,18 +33,33 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun EncyclopediaScreen(
     listState: LazyListState,
+    selectedFunction: String,
+    onSelectedFunctionChange: (String) -> Unit,
+    searchText: String,
+    onSearchTextChange: (String) -> Unit,
     onExcipientSelected: (Excipient) -> Unit, 
     onBack: () -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
     val functions = encyclopediaFilters.keys.toList()
-    var selectedFunction by remember { mutableStateOf(functions[0]) }
 
-    val filteredExcipients = remember(selectedFunction) {
-        if (selectedFunction == "All Functions") {
-            excipients.sortedBy { it.name }
+    val filteredExcipients = remember(selectedFunction, searchText) {
+        val functionFiltered = if (selectedFunction == "All Functions") {
+            excipients
         } else {
             encyclopediaFilters[selectedFunction] ?: emptyList()
+        }
+
+        if (searchText.isBlank()) {
+            functionFiltered.sortedBy { it.name }
+        } else {
+            functionFiltered.filter { excipient ->
+                excipient.name.contains(searchText, ignoreCase = true) ||
+                excipient.alternativename.contains(searchText, ignoreCase = true) ||
+                excipient.function.contains(searchText, ignoreCase = true) ||
+                excipient.usage.contains(searchText, ignoreCase = true) ||
+                excipient.note.contains(searchText, ignoreCase = true)
+            }.sortedBy { it.name }
         }
     }
 
@@ -94,7 +109,7 @@ fun EncyclopediaScreen(
                         DropdownMenuItem(
                             text = { Text(function) },
                             onClick = {
-                                selectedFunction = function
+                                onSelectedFunctionChange(function)
                                 expanded = false
                             }
                         )
@@ -102,10 +117,19 @@ fun EncyclopediaScreen(
                 }
             }
 
+            Spacer(modifier = Modifier.height(8.dp))
+
+            TextField(
+                value = searchText,
+                onValueChange = onSearchTextChange,
+                label = { Text("Search...") },
+                modifier = Modifier.fillMaxWidth()
+            )
+
             Spacer(modifier = Modifier.height(16.dp))
 
             LazyColumn(
-                state = listState, // Use the hoisted state here
+                state = listState,
                 modifier = Modifier.fillMaxSize()
             ) {
                 items(filteredExcipients) { excipient ->

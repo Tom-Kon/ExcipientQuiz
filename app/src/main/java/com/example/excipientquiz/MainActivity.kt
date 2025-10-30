@@ -89,7 +89,10 @@ fun AppContent() {
     var selectedQuestionType by remember { mutableStateOf(PropertyType.NAME) }
     var selectedAnswerType by remember { mutableStateOf(PropertyType.STRUCTURE) }
     var selectedExcipient by remember { mutableStateOf<Excipient?>(null) }
+    
     val encyclopediaListState = rememberLazyListState()
+    var encyclopediaSearchText by remember { mutableStateOf("") }
+    var encyclopediaSelectedFunction by remember { mutableStateOf("All Functions") }
 
     LaunchedEffect(Unit) {
         SoundManager.playBackgroundMusic(context)
@@ -164,7 +167,15 @@ fun AppContent() {
                         prefs.edit().putStringSet("lastSelectedQuizModes", newModes).apply()
                         currentScreen = "start" }, onBack = { currentScreen = "start" })
                     "achievements" -> AchievementsScreen(onBack = { currentScreen = "start" })
-                    "encyclopedia" -> EncyclopediaScreen(listState = encyclopediaListState, onExcipientSelected = { selectedExcipient = it; currentScreen = "excipient_detail" }, onBack = { currentScreen = "start" })
+                    "encyclopedia" -> EncyclopediaScreen(
+                        listState = encyclopediaListState,
+                        selectedFunction = encyclopediaSelectedFunction,
+                        onSelectedFunctionChange = { encyclopediaSelectedFunction = it },
+                        searchText = encyclopediaSearchText,
+                        onSearchTextChange = { encyclopediaSearchText = it },
+                        onExcipientSelected = { selectedExcipient = it; currentScreen = "excipient_detail" },
+                        onBack = { currentScreen = "start" }
+                    )
                     "excipient_detail" -> selectedExcipient?.let { ExcipientDetailScreen(excipient = it, onBack = { currentScreen = "encyclopedia" }) }
                     "game" -> ExcipientGameScreen(gameMode = selectedGameMode, questionType = selectedQuestionType, answerType = selectedAnswerType, quizModes = selectedQuizModes, onGameOver = { currentScreen = "start" })
                 }
