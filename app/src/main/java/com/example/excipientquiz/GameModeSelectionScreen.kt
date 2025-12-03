@@ -40,7 +40,7 @@ fun GameModeSelectionScreen(
 ) {
     val context = LocalContext.current
 
-    val isTimeAttackUnlocked = ProgressionManager.isPlayable(context, quizModes, questionType, answerType, GameMode.TIME_ATTACK)
+    val isExcipientSpeedrunUnlocked = ProgressionManager.isPlayable(context, quizModes, questionType, answerType, GameMode.EXCIPIENT_SPEEDRUN)
     val isSurvivalUnlocked = ProgressionManager.isPlayable(context, quizModes, questionType, answerType, GameMode.SURVIVAL)
 
     Column(
@@ -56,8 +56,8 @@ fun GameModeSelectionScreen(
         ModeSelectionCard(
             title = stringResource(id = R.string.gamemode_time_attack),
             iconRes = R.drawable.ic_time,
-            isUnlocked = isTimeAttackUnlocked,
-            onClick = { if (isTimeAttackUnlocked) onModeSelected(GameMode.TIME_ATTACK) }
+            isUnlocked = isExcipientSpeedrunUnlocked,
+            onClick = { if (isExcipientSpeedrunUnlocked) onModeSelected(GameMode.EXCIPIENT_SPEEDRUN) }
         )
 
         Spacer(modifier = Modifier.height(24.dp))

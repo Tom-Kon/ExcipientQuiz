@@ -1,10 +1,8 @@
 package com.example.excipientquiz
 
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -13,9 +11,10 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -27,66 +26,47 @@ fun OptionsScreen(
     availableModes: Map<String, List<Excipient>>,
     initialSelection: Set<String>,
     onSave: (Set<String>) -> Unit,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    onShowSpecialModes: () -> Unit
 ) {
-    val selectedModes = remember { mutableStateOf(initialSelection) }
-    val allExcipientsMode = "All Excipients"
+    val selectedModes = remember { mutableStateListOf(*initialSelection.toTypedArray()) }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(stringResource(id = R.string.options_title), style = MaterialTheme.typography.headlineMedium)
-        Spacer(modifier = Modifier.height(16.dp))
-
-        LazyColumn(modifier = Modifier.weight(1f)) {
-            items(availableModes.keys.toList()) { mode ->
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { 
-                            val currentSelection = selectedModes.value.toMutableSet()
-
-                            if (mode == allExcipientsMode) {
-                                selectedModes.value = setOf(allExcipientsMode)
-                            } else {
-                                currentSelection.remove(allExcipientsMode)
-                                
-                                if (currentSelection.contains(mode)) {
-                                    currentSelection.remove(mode)
-                                } else {
-                                    currentSelection.add(mode)
-                                }
-
-                                if (currentSelection.isEmpty()) {
-                                    selectedModes.value = setOf(allExcipientsMode)
-                                } else {
-                                    selectedModes.value = currentSelection
-                                }
-                            }
-                        }
-                        .padding(vertical = 8.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Checkbox(
-                        checked = selectedModes.value.contains(mode),
-                        onCheckedChange = null
-                    )
-                    Text(text = mode, modifier = Modifier.padding(start = 16.dp))
-                }
+    Scaffold(
+        bottomBar = {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                Button(onClick = onBack) { Text(stringResource(id = R.string.common_back)) }
+                Button(onClick = { onSave(selectedModes.toSet()) }) { Text(stringResource(id = R.string.options_button_save)) }
             }
         }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Row {
-            Button(onClick = onBack, modifier = Modifier.padding(end = 8.dp)) {
-                Text(stringResource(id = R.string.common_back))
+    ) { innerPadding ->
+        LazyColumn(modifier = Modifier.padding(innerPadding).padding(horizontal = 16.dp)) {
+            item {
+                Text(text = stringResource(id = R.string.options_title), style = MaterialTheme.typography.headlineMedium)
+                Spacer(modifier = Modifier.height(16.dp))
             }
-            Button(onClick = { onSave(selectedModes.value) }) {
-                Text(stringResource(id = R.string.options_button_save))
+            
+            items(availableModes.keys.toList()) { mode ->
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Checkbox(
+                        checked = selectedModes.contains(mode),
+                        onCheckedChange = {
+                            if (it) selectedModes.add(mode) else selectedModes.remove(mode)
+                        }
+                    )
+                    Text(mode)
+                }
+            }
+
+            item {
+                Spacer(modifier = Modifier.height(24.dp))
+                Button(onClick = onShowSpecialModes, modifier = Modifier.fillMaxWidth()) {
+                    Text("Special Game Modes")
+                }
             }
         }
     }

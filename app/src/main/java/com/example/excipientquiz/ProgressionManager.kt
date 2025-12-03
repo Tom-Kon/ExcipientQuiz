@@ -3,12 +3,6 @@ package com.example.excipientquiz
 import android.content.Context
 import android.content.SharedPreferences
 
-enum class ProgressionTier {
-    LOCKED,          // Only Name/Structure is available in Survival
-    ALTERNATIVE_NAMES, // Alt names and Molecule Type are unlocked in Survival, Base pair in Time Attack
-    FULLY_UNLOCKED   // All pairs available in Survival, Tier 2 pairs in Time Attack
-}
-
 object ProgressionManager {
 
     private const val PREFS_NAME = "ExcipientQuizProgression"
@@ -65,7 +59,7 @@ object ProgressionManager {
             survivalRequirement
         }
 
-        if (gameMode == GameMode.TIME_ATTACK) {
+        if (gameMode == GameMode.EXCIPIENT_SPEEDRUN) {
             return when (baseRequirement) {
                 ProgressionTier.LOCKED -> ProgressionTier.ALTERNATIVE_NAMES
                 ProgressionTier.ALTERNATIVE_NAMES -> ProgressionTier.FULLY_UNLOCKED

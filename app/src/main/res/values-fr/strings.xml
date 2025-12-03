@@ -1,9 +1,10 @@
 <resources>
     <!-- Tutorial Screen -->
+    <string name="app_name">Quiz des excipients</string>
     <string name="tutorial_welcome_title">Bienvenue au Quiz sur les Excipients Pharmaceutiques !</string>
     <string name="tutorial_goal">Votre but dans ce jeu est de maîtriser les excipients pharmaceutiques. Cela inclut leurs noms et noms alternatifs, leurs structures, leurs fonctions, et bien plus encore !</string>
     <string name="tutorial_progression">De nombreux modes de jeu sont initialement verrouillés. Débloquez des modes de jeu en terminant des quiz en mode survie ! Vous pouvez sélectionner les excipients avec lesquels vous voulez jouer via le bouton \'Contenu du quiz\'. Lorsque vous terminez des catégories individuelles, vous pouvez les combiner pour jouer avec de plus en plus d\'excipients à la fois ! Si vous avez oublié ce qui est déverrouillé, consultez le bouton de progression.</string>
-    <string name="tutorial_time_attack">Une fois que vous êtes à l\'aise avec le mode survie et que vous avez débloqué le mode contre-la-montre, testez votre vitesse pour établir de nouveaux scores records !</string>
+    <string name="tutorial_time_attack">Une fois que vous êtes à l\'aise avec le mode survie et que vous avez débloqué le mode Excipient Speedrun, testez votre vitesse pour établir de nouveaux scores records !</string>
     <string name="tutorial_extra">N\'oubliez pas de consulter les succès que vous pouvez obtenir dans l\'onglet des succès. De plus, l\'encyclopédie contient de nombreuses informations supplémentaires sur tous les excipients du jeu.</string>
     <string name="tutorial_button_start">C\'est parti !</string>
 
@@ -17,9 +18,10 @@
     <string name="settings_language_nl">Néerlandais</string>
     <string name="settings_language_fr">Français</string>
     <string name="settings_language_de">Allemand</string>
+    <string name="settings_button_credits">Crédits</string>
 
     <!-- Start Screen -->
-    <string name="start_title">Pharmaceutical Excipient Quiz 💊</string>
+    <string name="start_title">Pharmaceutical Excipient Quiz</string>
     <string name="start_button_challenge">Démarrer le défi</string>
     <string name="start_button_options">Contenu du quiz</string>
     <string name="start_button_progression">Progression</string>
@@ -31,7 +33,7 @@
 
     <!-- Game Mode Selection -->
     <string name="gamemode_title">Choisissez votre mode</string>
-    <string name="gamemode_time_attack">Contre-la-montre</string>
+    <string name="gamemode_time_attack">Excipient Speedrun</string>
     <string name="gamemode_survival">Survie</string>
     <string name="gamemode_button_back">Retour</string>
 
@@ -39,11 +41,11 @@
     <string name="gamescreen_label_score">Score : %d</string>
     <string name="gamescreen_label_timer">Temps : %d</string>
     <string name="gamescreen_no_questions">Aucune question trouvée pour les modes sélectionnés.</string>
-    <string name="gamescreen_question_prompt">Quel(le) %s correspond à ce(tte) %s ?</string>
+    <string name="gamescreen_question_prompt">Quel(le) %1$s correspond à ce(tte) %2$s ?</string>
 
     <!-- Result Screen -->
     <string name="resultscreen_new_highscore">Nouveau record !</string>
-    <string name="resultscreen_score_time_attack">Vous avez obtenu %d / %d !</string>
+    <string name="resultscreen_score_time_attack">Vous avez obtenu %1$d / %2$d !</string>
     <string name="resultscreen_score_survival">Vous avez obtenu %d !</string>
     <string name="resultscreen_previous_highscore">Record précédent : %s</string>
     <string name="resultscreen_label_none">aucun</string>
@@ -60,20 +62,24 @@
 
     <!-- Achievements Screen -->
     <string name="achievements_title">Succès</string>
-    <string name="achievement_time_attack_ace_desc">Obtenez le statut d\'Expert du Timing dans toutes les catégories de quiz.</string>
+    <string name="achievement_time_attack_ace_desc">Obtenez le statut d\'Expert du Speedrun dans toutes les catégories de quiz.</string>
     <string name="achievement_survivalist_desc">Obtenez le statut d\'Expert de la Survie dans toutes les catégories de quiz.</string>
-    <string name="achievement_expert_desc">Terminez toutes les paires Q&amp;R pour %s en mode %s.</string>
+    <string name="achievement_expert_desc">Terminez toutes les paires Q&amp;R pour %1$s en mode %2$s.</string>
 
     <!-- Dialogs -->
     <string name="dialog_achievement_title_single">Succès débloqué !</string>
     <string name="dialog_achievement_title_multiple">Succès débloqués !</string>
     <string name="dialog_achievement_button">Génial !</string>
     <string name="dialog_progression_title">Nouveaux quiz débloqués !</string>
-    <string name="dialog_progression_body">Vous avez débloqué les quiz %s pour %s !</string>
-    <string name="dialog_progression_body_time_attack">Vous avez débloqué les quiz %s ainsi que le mode contre-la-montre pour %s !</string>
+    <string name="dialog_progression_body">Vous avez débloqué les quiz %1$s pour %2$s !</string>
+    <string name="dialog_progression_body_time_attack">Vous avez débloqué les quiz %1$s ainsi que le mode Excipient Speedrun pour %2$s !</string>
     <string name="dialog_progression_tier2">Noms Alternatifs et Types de Molécules</string>
     <string name="dialog_progression_tier3">Tous</string>
     <string name="dialog_progression_button">Super !</string>
+
+    <!-- Credits Screen -->
+    <string name="credits_title">Crédits</string>
+    <string name="credits_body">Cette application a été développée par Tom Konings, mais a été inspirée par le \"quiz sur les acides aminés\" et le quiz sur les groupes fonctionnels. Google Gemini a été utilisé pour la plupart du codage, mais l\'encyclopédie a été rédigée avec l\'aide d\'experts, et de Guy Van den Mooter en particulier.</string>
 
     <!-- Common -->
     <string name="common_back">Retour</string>

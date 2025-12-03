@@ -51,35 +51,55 @@ fun AchievementsScreen(onBack: () -> Unit) {
     val staticAchievements = listOf(
         Achievement(
             id = AchievementManager.TIME_ATTACK_ACE,
-            name = "Time Attack Ace",
+            name = "Excipient Speedrun Ace",
             descriptionResId = R.string.achievement_time_attack_ace_desc,
-            imageRes = R.drawable.badge_time_attack_ace
+            imageRes = R.drawable.allachievementtime
         ),
         Achievement(
             id = AchievementManager.SURVIVALIST,
             name = "Survivalist",
             descriptionResId = R.string.achievement_survivalist_desc,
-            imageRes = R.drawable.badge_survivalist
+            imageRes = R.drawable.allachievementsurvival
         )
     )
 
     val dynamicAchievements = quizModes.keys
         .filter { it != "All Excipients" && it != "Other" }
         .flatMap { category ->
+            val survivalImage = when (category) {
+                "Parenterals & Liquids" -> R.drawable.liquidsachievementsurvival
+                "Creams & Emulsions" -> R.drawable.creamsachievementsurvival
+                "Gels & Suspensions" -> R.drawable.suspensionsachievementsurvival
+                "Solid dosage forms" -> R.drawable.soliddosageachievementsurvival
+                "Preservatives & antioxidants" -> R.drawable.preservativesachievementsurvival
+                "Lotions & shampoos" -> R.drawable.shampoosachievementsurvival
+                else -> R.drawable.ic_survival // Fallback
+            }
+            
+            val timeAttackImage = when (category) {
+                "Parenterals & Liquids" -> R.drawable.liquidsachievementtime
+                "Creams & Emulsions" -> R.drawable.creamsachievementtime
+                "Gels & Suspensions" -> R.drawable.suspensionsachievementtime
+                "Solid dosage forms" -> R.drawable.soliddosageachievementtime
+                "Preservatives & antioxidants" -> R.drawable.preservativesachievementtime
+                "Lotions & shampoos" -> R.drawable.shampoosachievementtime
+                else -> R.drawable.ic_time // Fallback
+            }
+
             listOf(
                 Achievement(
                     id = AchievementManager.getSurvivalExpertId(category),
                     name = "$category Survival Expert",
                     descriptionResId = R.string.achievement_expert_desc,
                     descriptionFormatArgs = listOf(category, "Survival"),
-                    imageRes = R.drawable.ic_survival
+                    imageRes = survivalImage
                 ),
                 Achievement(
                     id = AchievementManager.getTimeAttackExpertId(category),
-                    name = "$category Timing Expert",
+                    name = "$category Speedrun Expert",
                     descriptionResId = R.string.achievement_expert_desc,
-                    descriptionFormatArgs = listOf(category, "Time Attack"),
-                    imageRes = R.drawable.ic_time
+                    descriptionFormatArgs = listOf(category, "Excipient Speedrun"),
+                    imageRes = timeAttackImage
                 )
             )
         }
@@ -127,7 +147,7 @@ fun AchievementCard(achievement: Achievement, isUnlocked: Boolean) {
     Card(
         modifier = Modifier
             .padding(8.dp)
-            .alpha(if (isUnlocked) 1f else 0.5f)
+            .alpha(if (isUnlocked) 1f else 0.25f)
     ) {
         Column(
             modifier = Modifier
@@ -144,7 +164,6 @@ fun AchievementCard(achievement: Achievement, isUnlocked: Boolean) {
             Spacer(modifier = Modifier.height(8.dp))
             Text(text = achievement.name, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
             Spacer(modifier = Modifier.height(4.dp))
-            // Correctly resolve string resource here
             Text(
                 text = stringResource(id = achievement.descriptionResId, *achievement.descriptionFormatArgs.toTypedArray()),
                 style = MaterialTheme.typography.bodySmall, 

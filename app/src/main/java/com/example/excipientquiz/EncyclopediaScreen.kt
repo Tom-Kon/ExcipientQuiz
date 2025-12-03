@@ -11,6 +11,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -18,6 +21,8 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -40,7 +45,9 @@ fun EncyclopediaScreen(
     onExcipientSelected: (Excipient) -> Unit, 
     onBack: () -> Unit
 ) {
-    var expanded by remember { mutableStateOf(false) }
+    var showFilter by remember { mutableStateOf(false) }
+    var isFilterMenuExpanded by remember { mutableStateOf(false) }
+    var showSearch by remember { mutableStateOf(false) }
     val functions = encyclopediaFilters.keys.toList()
 
     val filteredExcipients = remember(selectedFunction, searchText) {
@@ -67,6 +74,22 @@ fun EncyclopediaScreen(
         topBar = {
             CenterAlignedTopAppBar(
                 title = { Text("Excipient Encyclopedia") },
+                navigationIcon = {
+                    IconButton(onClick = { 
+                        showFilter = !showFilter
+                        if (showFilter) showSearch = false // Hide search when showing filter
+                    }) {
+                        Icon(Icons.Default.List, contentDescription = "Filter")
+                    }
+                },
+                actions = {
+                    IconButton(onClick = { 
+                        showSearch = !showSearch
+                        if (showSearch) showFilter = false // Hide filter when showing search
+                     }) {
+                        Icon(Icons.Default.Search, contentDescription = "Search")
+                    }
+                },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
                     containerColor = Color.Transparent
                 )
@@ -88,43 +111,45 @@ fun EncyclopediaScreen(
         Column(
             modifier = Modifier.padding(innerPadding).padding(horizontal = 16.dp)
         ) {
-            ExposedDropdownMenuBox(
-                expanded = expanded,
-                onExpandedChange = { expanded = !expanded },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                TextField(
-                    value = selectedFunction,
-                    onValueChange = {},
-                    readOnly = true,
-                    label = { Text("Filter by Function") },
-                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                    modifier = Modifier.menuAnchor().fillMaxWidth()
-                )
-                ExposedDropdownMenu(
-                    expanded = expanded,
-                    onDismissRequest = { expanded = false }
+            if (showFilter) {
+                ExposedDropdownMenuBox(
+                    expanded = isFilterMenuExpanded,
+                    onExpandedChange = { isFilterMenuExpanded = !isFilterMenuExpanded },
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    functions.forEach { function ->
-                        DropdownMenuItem(
-                            text = { Text(function) },
-                            onClick = {
-                                onSelectedFunctionChange(function)
-                                expanded = false
-                            }
-                        )
+                    TextField(
+                        value = selectedFunction,
+                        onValueChange = {},
+                        readOnly = true,
+                        label = { Text("Filter by Function") },
+                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = isFilterMenuExpanded) },
+                        modifier = Modifier.menuAnchor().fillMaxWidth()
+                    )
+                    ExposedDropdownMenu(
+                        expanded = isFilterMenuExpanded,
+                        onDismissRequest = { isFilterMenuExpanded = false }
+                    ) {
+                        functions.forEach { function ->
+                            DropdownMenuItem(
+                                text = { Text(function) },
+                                onClick = {
+                                    onSelectedFunctionChange(function)
+                                    isFilterMenuExpanded = false
+                                }
+                            )
+                        }
                     }
                 }
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
-
-            TextField(
-                value = searchText,
-                onValueChange = onSearchTextChange,
-                label = { Text("Search...") },
-                modifier = Modifier.fillMaxWidth()
-            )
+            if(showSearch) {
+                TextField(
+                    value = searchText,
+                    onValueChange = onSearchTextChange,
+                    label = { Text("Search...") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
 
             Spacer(modifier = Modifier.height(16.dp))
 

@@ -42,7 +42,7 @@ private val languages = listOf(
 )
 
 @Composable
-fun SettingsScreen(onBack: () -> Unit, onShowTutorial: () -> Unit) {
+fun SettingsScreen(onBack: () -> Unit, onShowTutorial: () -> Unit, onShowCredits: () -> Unit) {
     val context = LocalContext.current
     val activity = (LocalContext.current as? Activity)
 
@@ -74,7 +74,7 @@ fun SettingsScreen(onBack: () -> Unit, onShowTutorial: () -> Unit) {
         SettingSwitch(label = stringResource(id = R.string.settings_music), isChecked = musicEnabled.value) {
             musicEnabled.value = it
             SettingsManager.setMusicEnabled(context, it)
-            if (it) SoundManager.playBackgroundMusic(context) else SoundManager.pauseBackgroundMusic()
+            if (it) SoundManager.resumeMusic(context) else SoundManager.pauseBackgroundMusic()
         }
         Spacer(modifier = Modifier.height(24.dp))
         SettingSwitch(label = stringResource(id = R.string.settings_sfx), isChecked = sfxEnabled.value) {
@@ -114,6 +114,8 @@ fun SettingsScreen(onBack: () -> Unit, onShowTutorial: () -> Unit) {
 
         Spacer(modifier = Modifier.height(48.dp))
         Button(onClick = onShowTutorial) { Text(stringResource(id = R.string.settings_show_tutorial)) }
+        Spacer(modifier = Modifier.height(16.dp))
+        Button(onClick = onShowCredits) { Text(stringResource(id = R.string.settings_button_credits)) }
         Spacer(modifier = Modifier.weight(1f))
         Button(onClick = onBack) { Text(stringResource(id = R.string.common_back)) }
     }

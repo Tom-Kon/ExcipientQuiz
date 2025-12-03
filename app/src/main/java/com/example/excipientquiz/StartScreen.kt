@@ -62,7 +62,7 @@ fun ExcipientGameStartScreen(
 
     val isPairValid = questionType != answerType
     val isPlayable = ProgressionManager.isPlayable(context, selectedQuizModes, questionType, answerType, GameMode.SURVIVAL) || 
-                     ProgressionManager.isPlayable(context, selectedQuizModes, questionType, answerType, GameMode.TIME_ATTACK)
+                     ProgressionManager.isPlayable(context, selectedQuizModes, questionType, answerType, GameMode.EXCIPIENT_SPEEDRUN)
 
 
     fun updateQuestionType(offset: Int) {

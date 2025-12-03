@@ -84,9 +84,9 @@ fun ExcipientGameScreen(
     var mistakes by remember { mutableStateOf(0) }
     var newlyUnlockedAchievements by remember { mutableStateOf<List<Achievement>>(emptyList()) }
     var newlyUnlockedTierInfo by remember { mutableStateOf<Pair<ProgressionTier, String>?>(null) }
-    var survivalTimer by remember { mutableStateOf(10) }
+    var survivalTimer by remember { mutableStateOf(15) }
 
-    if (gameMode == GameMode.TIME_ATTACK && !showResult) {
+    if (gameMode == GameMode.EXCIPIENT_SPEEDRUN && !showResult) {
         LaunchedEffect(Unit) {
             while (true) {
                 delay(1000)
@@ -97,7 +97,7 @@ fun ExcipientGameScreen(
 
     if (gameMode == GameMode.SURVIVAL && !showResult && !isQuestionAnswered) {
         LaunchedEffect(currentIndex) {
-            survivalTimer = 10
+            survivalTimer = 15
             while (survivalTimer > 0) {
                 delay(1000)
                 if (!isQuestionAnswered) {
@@ -133,7 +133,7 @@ fun ExcipientGameScreen(
             selectedAnswer = null
             isQuestionAnswered = false
             isAnswerCorrect = false
-            survivalTimer = 10
+            survivalTimer = 15
         } else {
             showResult = true
         }
@@ -300,7 +300,7 @@ private fun ResultScreen(
     LaunchedEffect(Unit) {
         val wasSuccessful = if(gameMode == GameMode.SURVIVAL) lives > 0 else (score.toFloat() / questionCount) >= 0.5f
 
-        if (gameMode == GameMode.TIME_ATTACK) {
+        if (gameMode == GameMode.EXCIPIENT_SPEEDRUN) {
             val oldHighScore = ScoreManager.getTimeAttackHighScore(context, questionType, answerType, quizModes)
             if (oldHighScore.first > 0) previousHighScoreString = "${oldHighScore.first} (${oldHighScore.second}s)"
             if (score > oldHighScore.first || (score == oldHighScore.first && elapsedTime < oldHighScore.second)) {
@@ -348,8 +348,8 @@ private fun ResultScreen(
             Text(stringResource(id = R.string.resultscreen_new_highscore), fontSize = 36.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
             Spacer(modifier = Modifier.height(16.dp))
         }
-        Text(if (gameMode == GameMode.TIME_ATTACK) stringResource(id = R.string.resultscreen_score_time_attack, score, questionCount) else stringResource(id = R.string.resultscreen_score_survival, score), fontSize = 30.sp)
-        if (gameMode == GameMode.TIME_ATTACK) Text("Time: ${elapsedTime}s", fontSize = 24.sp)
+        Text(if (gameMode == GameMode.EXCIPIENT_SPEEDRUN) stringResource(id = R.string.resultscreen_score_time_attack, score, questionCount) else stringResource(id = R.string.resultscreen_score_survival, score), fontSize = 30.sp)
+        if (gameMode == GameMode.EXCIPIENT_SPEEDRUN) Text("Time: ${elapsedTime}s", fontSize = 24.sp)
         Spacer(modifier = Modifier.height(24.dp))
         Text(stringResource(id = R.string.resultscreen_previous_highscore, previousHighScoreString), fontSize = 16.sp)
         Spacer(modifier = Modifier.height(48.dp))
@@ -429,7 +429,7 @@ fun ImageTile(excipient: Excipient, isAnswered: Boolean, isSelected: Boolean, is
     Card(
         onClick = onClick,
         modifier = Modifier.size(150.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp, pressedElevation = 12.dp),
         colors = CardDefaults.cardColors(containerColor = tileColor)
     ) {
         Box(modifier = Modifier.fillMaxSize().padding(8.dp), contentAlignment = Alignment.Center) {
@@ -505,6 +505,7 @@ private fun AnswerContent(
                     Button(
                         onClick = { onAnswerSelected(option) },
                         modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                        elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp, pressedElevation = 8.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = buttonColor)
                     ) {
                         Text(option, color = Color.Black)

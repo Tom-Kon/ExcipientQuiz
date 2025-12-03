@@ -1,20 +1,21 @@
 package com.example.excipientquiz
 
-/**
- * Defines the different game modes available.
- */
 enum class GameMode {
-    TIME_ATTACK,
+    EXCIPIENT_SPEEDRUN,
     SURVIVAL
 }
 
-/**
- * Defines the different properties of an excipient that can be used in the quiz.
- */
 enum class PropertyType {
     NAME,
     STRUCTURE,
     FUNCTION,
     ALTERNATIVE_NAME,
     MOLECULE_TYPE
+}
+
+// Represents the tiers of progression for a given quiz mode
+enum class ProgressionTier {
+    LOCKED, // Only Name -> Structure is available in Survival Mode
+    ALTERNATIVE_NAMES, // Alt names and Molecule Type are unlocked in Survival, Base pair in Excipient Speedrun
+    FULLY_UNLOCKED   // All pairs available in Survival, Tier 2 pairs in Excipient Speedrun
 }

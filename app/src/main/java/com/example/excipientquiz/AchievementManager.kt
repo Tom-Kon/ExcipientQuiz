@@ -1,113 +1,120 @@
 package com.example.excipientquiz
 
 import android.content.Context
-import android.content.SharedPreferences
 
 object AchievementManager {
-
     private const val PREFS_NAME = "ExcipientQuizAchievements"
 
-    // --- Main Achievement IDs ---
-    const val TIME_ATTACK_ACE = "achievement_time_attack_ace"
-    const val SURVIVALIST = "achievement_survivalist"
+    const val TIME_ATTACK_ACE = "excipient_speedrun_ace"
+    const val SURVIVALIST = "survivalist"
 
-    // --- Dynamic Achievement ID Generators ---
-    fun getSurvivalExpertId(category: String) = "expert_survival_${category.lowercase().replace(" ", "_")}"
-    fun getTimeAttackExpertId(category: String) = "expert_timing_${category.lowercase().replace(" ", "_")}"
+    fun getSurvivalExpertId(category: String) = "survival_expert_$category"
+    fun getTimeAttackExpertId(category: String) = "excipient_speedrun_expert_$category"
 
-    private fun getPreferences(context: Context): SharedPreferences {
-        return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-    }
+    private fun getPrefs(context: Context) = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
-    // --- Public unlock status check ---
     fun isAchievementUnlocked(context: Context, achievementId: String): Boolean {
-        return getPreferences(context).getBoolean(achievementId, false)
+        return getPrefs(context).getBoolean(achievementId, false)
     }
 
     private fun unlockAchievement(context: Context, achievementId: String) {
-        getPreferences(context).edit().putBoolean(achievementId, true).apply()
-    }
-
-    // --- Game Completion Tracking ---
-    private fun getCompletionKey(quizMode: String, gameMode: GameMode, qType: PropertyType, aType: PropertyType): String {
-        val sortedPair = listOf(qType.name, aType.name).sorted()
-        return "completed_${gameMode.name}_${quizMode}_${sortedPair[0]}_${sortedPair[1]}"
-    }
-
-    private fun markGameAsCompleted(context: Context, gameMode: GameMode, quizMode: String, qType: PropertyType, aType: PropertyType) {
-        val key = getCompletionKey(quizMode, gameMode, qType, aType)
-        getPreferences(context).edit().putBoolean(key, true).apply()
-    }
-
-    private fun areAllPairsCompletedForMode(context: Context, quizMode: String, gameMode: GameMode): Boolean {
-        val allPropTypes = PropertyType.values()
-        val allPossiblePairs = allPropTypes.flatMap { p1 ->
-            allPropTypes.mapNotNull { p2 ->
-                if (p1 != p2) setOf(p1, p2) else null
-            }
-        }.distinct()
-
-        return allPossiblePairs.all { pair ->
-            val key = getCompletionKey(quizMode, gameMode, pair.first(), pair.last())
-            getPreferences(context).getBoolean(key, false)
-        }
-    }
-
-    private fun areAllExpertAchievementsUnlocked(context: Context, gameMode: GameMode): Boolean {
-        val allProgressionCategories = quizModes.keys.filter { it != "All Excipients" && it != "Other" }
-        return allProgressionCategories.all { category ->
-            val expertId = if (gameMode == GameMode.SURVIVAL) getSurvivalExpertId(category) else getTimeAttackExpertId(category)
-            isAchievementUnlocked(context, expertId)
-        }
+        getPrefs(context).edit().putBoolean(achievementId, true).apply()
     }
 
     fun recordCompletionAndCheckForNewAchievements(
-        context: Context, gameMode: GameMode, quizModes: Set<String>, 
-        qType: PropertyType, aType: PropertyType, wasSuccessful: Boolean
+        context: Context,
+        gameMode: GameMode,
+        quizModes: Set<String>,
+        questionType: PropertyType,
+        answerType: PropertyType,
+        wasSuccessful: Boolean
     ): List<Achievement> {
+        if (!wasSuccessful) return emptyList()
 
-        if (!wasSuccessful || quizModes.size != 1) return emptyList()
-        val quizMode = quizModes.first()
-        if (quizMode == "All Excipients" || quizMode == "Other") return emptyList()
+        val newAchievements = mutableListOf<Achievement>()
 
-        markGameAsCompleted(context, gameMode, quizMode, qType, aType)
-
-        val newlyUnlocked = mutableListOf<Achievement>()
-
-        val expertId = if (gameMode == GameMode.SURVIVAL) getSurvivalExpertId(quizMode) else getTimeAttackExpertId(quizMode)
-        if (!isAchievementUnlocked(context, expertId)) {
-            if (areAllPairsCompletedForMode(context, quizMode, gameMode)) {
-                unlockAchievement(context, expertId)
-                val name = "$quizMode ${if (gameMode == GameMode.SURVIVAL) "Survival" else "Timing"} Expert"
-                newlyUnlocked.add(
-                    Achievement(
-                        id = expertId, 
-                        name = name, 
-                        descriptionResId = R.string.achievement_expert_desc, 
-                        descriptionFormatArgs = listOf(quizMode, gameMode.name.replace("_", " ")),
-                        imageRes = if (gameMode == GameMode.SURVIVAL) R.drawable.ic_survival else R.drawable.ic_time
-                    )
-                )
-
-                val megaId = if (gameMode == GameMode.SURVIVAL) SURVIVALIST else TIME_ATTACK_ACE
-                if (!isAchievementUnlocked(context, megaId)) {
-                    if (areAllExpertAchievementsUnlocked(context, gameMode)) {
-                        unlockAchievement(context, megaId)
-                        val megaName = if (gameMode == GameMode.SURVIVAL) "Survivalist" else "Time Attack Ace"
-                        val descId = if (gameMode == GameMode.SURVIVAL) R.string.achievement_survivalist_desc else R.string.achievement_time_attack_ace_desc
-                        newlyUnlocked.add(
-                            Achievement(
-                                id = megaId, 
-                                name = megaName, 
-                                descriptionResId = descId,
-                                imageRes = R.drawable.badge_time_attack_ace
-                            )
-                        )
+        // Individual Category Achievement
+        if (quizModes.size == 1) {
+            val category = quizModes.first()
+            if (category != "All Excipients" && category != "Other") {
+                val achievementId = when (gameMode) {
+                    GameMode.SURVIVAL -> getSurvivalExpertId(category)
+                    GameMode.EXCIPIENT_SPEEDRUN -> getTimeAttackExpertId(category)
+                }
+                if (!isAchievementUnlocked(context, achievementId)) {
+                    unlockAchievement(context, achievementId)
+                    // We need to create the achievement object to show it
+                    val achievement = allAchievements(context).find { it.id == achievementId }
+                    if (achievement != null) {
+                        newAchievements.add(achievement)
                     }
                 }
             }
         }
+
+        // Check for "Ace" achievements
+        val allCategories = com.example.excipientquiz.quizModes.keys.filter { it != "All Excipients" && it != "Other" }
+
+        if (gameMode == GameMode.SURVIVAL) {
+            if (!isAchievementUnlocked(context, SURVIVALIST)) {
+                val allSurvivalUnlocked = allCategories.all { isAchievementUnlocked(context, getSurvivalExpertId(it)) }
+                if (allSurvivalUnlocked) {
+                    unlockAchievement(context, SURVIVALIST)
+                    val achievement = allAchievements(context).find { it.id == SURVIVALIST }
+                    if (achievement != null) newAchievements.add(achievement)
+                }
+            }
+        } else if (gameMode == GameMode.EXCIPIENT_SPEEDRUN) {
+            if (!isAchievementUnlocked(context, TIME_ATTACK_ACE)) {
+                val allTimeAttackUnlocked = allCategories.all { isAchievementUnlocked(context, getTimeAttackExpertId(it)) }
+                if (allTimeAttackUnlocked) {
+                    unlockAchievement(context, TIME_ATTACK_ACE)
+                    val achievement = allAchievements(context).find { it.id == TIME_ATTACK_ACE }
+                    if (achievement != null) newAchievements.add(achievement)
+                }
+            }
+        }
         
-        return newlyUnlocked
+        return newAchievements
+    }
+
+    // Helper to get all possible achievements for checking
+    private fun allAchievements(context: Context): List<Achievement> {
+         val staticAchievements = listOf(
+            Achievement(
+                id = TIME_ATTACK_ACE,
+                name = "Excipient Speedrun Ace",
+                descriptionResId = R.string.achievement_time_attack_ace_desc,
+                imageRes = R.drawable.badge_time_attack_ace
+            ),
+            Achievement(
+                id = SURVIVALIST,
+                name = "Survivalist",
+                descriptionResId = R.string.achievement_survivalist_desc,
+                imageRes = R.drawable.badge_survivalist
+            )
+        )
+
+        val dynamicAchievements = quizModes.keys
+            .filter { it != "All Excipients" && it != "Other" }
+            .flatMap { category ->
+                listOf(
+                    Achievement(
+                        id = getSurvivalExpertId(category),
+                        name = "$category Survival Expert",
+                        descriptionResId = R.string.achievement_expert_desc,
+                        descriptionFormatArgs = listOf(category, "Survival"),
+                        imageRes = R.drawable.ic_survival // Placeholder, real image is in AchievementsScreen
+                    ),
+                    Achievement(
+                        id = getTimeAttackExpertId(category),
+                        name = "$category Timing Expert",
+                        descriptionResId = R.string.achievement_expert_desc,
+                        descriptionFormatArgs = listOf(category, "Excipient Speedrun"),
+                        imageRes = R.drawable.ic_time // Placeholder
+                    )
+                )
+            }
+        return staticAchievements + dynamicAchievements
     }
 }
