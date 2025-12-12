@@ -25,17 +25,12 @@ fun App() {
     // 1. State holding the current language code
     var currentLanguageCode by remember { mutableStateOf(SettingsManager.getLanguage()) }
 
-    // 2. Version counter to force recomposition when language changes
-    var localeVersion by remember { mutableStateOf(0) }
-
     CompositionLocalProvider(LocalLocale provides Locale(currentLanguageCode)) {
         MaterialTheme {
             AppContent(
                 updateLanguage = { newLanguageCode ->
                     currentLanguageCode = newLanguageCode
-                    localeVersion++ // increment to force recompose
-                },
-                localeVersion = localeVersion
+                }
             )
         }
     }
@@ -43,8 +38,7 @@ fun App() {
 
 @Composable
 fun AppContent(
-    updateLanguage: (String) -> Unit,
-    localeVersion: Int // <- new parameter
+    updateLanguage: (String) -> Unit
 ) {
     var currentScreen by remember { mutableStateOf("start") }
 
@@ -83,14 +77,12 @@ fun AppContent(
             }
 
             // --- SETTINGS SCREEN ---
-            "settings" -> key(localeVersion) { // <-- wrap in key to force recomposition
-                SettingsScreen(
-                    onBack = { currentScreen = "start" },
-                    onShowTutorial = { currentScreen = "tutorial" },
-                    onShowCredits = { currentScreen = "credits" },
-                    updateLanguage = updateLanguage
-                )
-            }
+            "settings" -> SettingsScreen(
+                onBack = { currentScreen = "start" },
+                onShowTutorial = { currentScreen = "tutorial" },
+                onShowCredits = { currentScreen = "credits" },
+                updateLanguage = updateLanguage
+            )
 
             "tutorial" -> TutorialScreen(onComplete = { currentScreen = "settings" })
             "credits" -> CreditsScreen(onBack = { currentScreen = "start" })

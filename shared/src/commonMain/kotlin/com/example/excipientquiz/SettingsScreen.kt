@@ -98,16 +98,16 @@ fun SettingsScreen(
             .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(localizedString(Res.string.settings_title), style = MaterialTheme.typography.headlineMedium)
+        Text(stringResource(Res.string.settings_title), style = MaterialTheme.typography.headlineMedium)
         Spacer(modifier = Modifier.height(48.dp))
 
-        SettingSwitch(label = localizedString(Res.string.settings_music), isChecked = musicEnabled.value) {
+        SettingSwitch(label = stringResource(Res.string.settings_music), isChecked = musicEnabled.value) {
             musicEnabled.value = it
             SettingsManager.setMusicEnabled(it)
             if (it) SoundManager.resumeMusic() else SoundManager.pauseBackgroundMusic()
         }
         Spacer(modifier = Modifier.height(24.dp))
-        SettingSwitch(label = localizedString(Res.string.settings_sfx), isChecked = sfxEnabled.value) {
+        SettingSwitch(label = stringResource(Res.string.settings_sfx), isChecked = sfxEnabled.value) {
             sfxEnabled.value = it
             SettingsManager.setSfxEnabled(it)
         }
@@ -118,11 +118,11 @@ fun SettingsScreen(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text(localizedString(Res.string.settings_language), style = MaterialTheme.typography.bodyLarge)
+            Text(stringResource(Res.string.settings_language), style = MaterialTheme.typography.bodyLarge)
             Box(modifier = Modifier.wrapContentSize(Alignment.TopStart)) {
                 TextButton(onClick = { languageMenuExpanded = true }) {
                     val currentLanguage = languages.find { it.code == currentLanguageCode } ?: languages.first()
-                    Text(localizedString(currentLanguage.nameRes))
+                    Text(stringResource(currentLanguage.nameRes))
                 }
                 DropdownMenu(
                     expanded = languageMenuExpanded,
@@ -130,7 +130,7 @@ fun SettingsScreen(
                 ) {
                     languages.forEach { lang ->
                         DropdownMenuItem(
-                            text = { Text(localizedString(lang.nameRes)) },
+                            text = { Text(stringResource(lang.nameRes)) },
                             onClick = {
                                 // --- 2. THIS IS THE LOGIC CHANGE ---
                                 val newLanguage = lang.code
@@ -150,9 +150,9 @@ fun SettingsScreen(
         }
 
         Spacer(modifier = Modifier.height(48.dp))
-        Button(onClick = onShowTutorial) { Text(localizedString(Res.string.settings_show_tutorial)) }
+        Button(onClick = onShowTutorial) { Text(stringResource(Res.string.settings_show_tutorial)) }
         Spacer(modifier = Modifier.height(16.dp))
-        Button(onClick = onShowCredits) { Text(localizedString(Res.string.settings_button_credits)) }
+        Button(onClick = onShowCredits) { Text(stringResource(Res.string.settings_button_credits)) }
         Spacer(modifier = Modifier.height(16.dp))
         Button(
             onClick = { showResetDialog = true },
@@ -161,7 +161,7 @@ fun SettingsScreen(
             Text("Reset Progression")
         }
         Spacer(modifier = Modifier.weight(1f))
-        Button(onClick = onBack) { Text(localizedString(Res.string.common_back)) }
+        Button(onClick = onBack) { Text(stringResource(Res.string.common_back)) }
     }
 }
 
@@ -176,4 +176,3 @@ private fun SettingSwitch(label: String, isChecked: Boolean, onCheckedChange: (B
         Switch(checked = isChecked, onCheckedChange = onCheckedChange)
     }
 }
-
