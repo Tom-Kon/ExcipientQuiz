@@ -1,4 +1,6 @@
 import org.jetbrains.compose.resources.ResourcesExtension
+import org.gradle.api.tasks.Copy
+import org.gradle.api.file.DuplicatesStrategy
 
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
@@ -12,9 +14,32 @@ compose.resources {
     generateResClass = always  // 'always' is correct for Kotlin 2.x
 }
 
+// Defer task configuration until after project evaluation to prevent lifecycle errors
+project.afterEvaluate {
+    // This handles the duplicate index.html file
+    tasks.named<Copy>("jsProcessResources") {
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    }
+
+    // This ensures the processed index.html is copied to the final docs folder
+    tasks.named("jsBrowserProductionWebpack") {
+        doLast {
+            copy {
+                from(tasks.named<Copy>("jsProcessResources").get().destinationDir)
+                into(rootProject.projectDir.resolve("docs"))
+            }
+        }
+    }
+}
+
 kotlin {
     js(IR) {
-        browser()
+        browser {
+            commonWebpackConfig {
+                outputFileName = "ExcipientQuiz-shared.js"
+                outputPath = rootProject.projectDir.resolve("docs")
+            }
+        }
         binaries.executable()
     }
 
@@ -56,6 +81,7 @@ kotlin {
         }
 
         val jsMain by getting {
+            resources.srcDir("src/jsMain/resources")
             dependencies {
                 implementation("com.russhwolf:multiplatform-settings-js:1.1.1")
             }

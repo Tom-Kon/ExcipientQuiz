@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<resources>
+    <!-- Tutorial Screen -->
+    <string name="app_name">Hilffstofquiz</string>
+    <string name="tutorial_welcome_title">Willkommen beim Quiz über pharmazeutische Hilfsstoffe!</string>
+    <string name="tutorial_goal">Ihr Ziel in diesem Spiel ist es, pharmazeutische Hilfsstoffe zu meistern. Dazu gehören ihre Namen und Alternativnamen, ihre Strukturen, ihre Funktionen und noch vieles mehr!</string>
+    <string name="tutorial_progression">Viele Spielmodi sind zu Beginn gesperrt. Schalten Sie Spielmodi frei, indem Sie Quizze im Überlebensmodus absolvieren! Über die Schaltfläche \'Quiz-Inhalt\' können Sie auswählen, mit welchen Hilfsstoffen Sie das Quiz spielen möchten. Wenn Sie einzelne Kategorien abschließen, können Sie diese kombinieren und mit immer mehr Hilfsstoffen gleichzeitig spielen! Wenn Sie vergessen haben, was freigeschaltet ist und was nicht, schauen Sie sich die Fortschritts-Schaltfläche an.</string>
+    <string name="tutorial_time_attack">Sobald Sie mit dem Überlebensmodus vertraut sind und den Excipient Speedrun-Modus freigeschaltet haben, testen Sie Ihre Geschwindigkeit, um neue Highscores aufzustellen!</string>
+    <string name="tutorial_extra">Schauen Sie sich unbedingt die Erfolge an, die Sie im Erfolge-Tab verdienen können. Darüber hinaus enthält die Enzyklopädie viele zusätzliche Informationen zu allen Hilfsstoffen im Spiel.</string>
+    <string name="tutorial_button_start">Los geht\'s!</string>
+
+    <!-- Settings Screen -->
+    <string name="settings_title">Einstellungen</string>
+    <string name="settings_music">Hintergrundmusik</string>
+    <string name="settings_sfx">Soundeffekte</string>
+    <string name="settings_show_tutorial">Anleitung erneut anzeigen</string>
+    <string name="settings_language">Sprache</string>
+    <string name="settings_language_en">Englisch</string>
+    <string name="settings_language_nl">Niederländisch</string>
+    <string name="settings_language_fr">Französisch</string>
+    <string name="settings_language_de">Deutsch</string>
+    <string name="settings_button_credits">Danksagung</string>
+
+    <!-- Start Screen -->
+    <string name="start_title">Pharmaceutical Excipient Quiz</string>
+    <string name="start_button_challenge">Herausforderung starten</string>
+    <string name="start_button_options">Quiz-Inhalt</string>
+    <string name="start_button_progression">Fortschritt</string>
+    <string name="start_button_achievements">Erfolge</string>
+    <string name="start_button_encyclopedia">Enzyklopädie</string>
+    <string name="start_label_active_modes">Aktiv: %s</string>
+    <string name="start_label_question">FRAGE</string>
+    <string name="start_label_answer">ANTWORT</string>
+
+    <!-- Game Mode Selection -->
+    <string name="gamemode_title">Wähle deinen Modus</string>
+    <string name="gamemode_time_attack">Excipient Speedrun</string>
+    <string name="gamemode_survival">Überleben</string>
+    <string name="gamemode_button_back">Zurück</string>
+
+    <!-- Game Screen -->
+    <string name="gamescreen_label_score">Punktzahl: %d</string>
+    <string name="gamescreen_label_timer">Zeit: %d</string>
+    <string name="gamescreen_no_questions">Keine Fragen für die ausgewählten Modi gefunden.</string>
+    <string name="gamescreen_question_prompt">Welche(r) %1$s passt zu diesem/dieser %2$s?</string>
+
+    <!-- Result Screen -->
+    <string name="resultscreen_new_highscore">Neuer Highscore!</string>
+    <string name="resultscreen_score_time_attack">Sie haben %1$d / %2$d richtig!</string>
+    <string name="resultscreen_score_survival">Sie haben %d richtig!</string>
+    <string name="resultscreen_previous_highscore">Vorheriger Highscore: %s</string>
+    <string name="resultscreen_label_none">keiner</string>
+    <string name="resultscreen_button_back">Zurück</string>
+
+    <!-- Progression Screen -->
+    <string name="progression_title">Fortschrittsstatus</string>
+    <string name="progression_tier2">Stufe 2</string>
+    <string name="progression_all">Alles</string>
+
+    <!-- Options Screen -->
+    <string name="options_title">Quiz-Inhalt auswählen</string>
+    <string name="options_button_save">Speichern</string>
+
+    <!-- Achievements Screen -->
+    <string name="achievements_title">Erfolge</string>
+    <string name="achievement_time_attack_ace_desc">Erreichen Sie den Status eines Speedrun-Experten in allen Quiz-Kategorien.</string>
+    <string name="achievement_survivalist_desc">Erreichen Sie den Status eines Überlebensexperten in allen Quiz-Kategorien.</string>
+    <string name="achievement_expert_desc">Schließen Sie alle F&amp;A-Paare für %1$s im %2$s-Modus ab.</string>
+
+    <!-- Dialogs -->
+    <string name="dialog_achievement_title_single">Erfolg freigeschaltet!</string>
+    <string name="dialog_achievement_title_multiple">Erfolge freigeschaltet!</string>
+    <string name="dialog_achievement_button">Großartig!</string>
+    <string name="dialog_progression_title">Neue Quizze freigeschaltet!</string>
+    <string name="dialog_progression_body">Sie haben die %1$s-Quizze für %2$s freigeschaltet!</string>
+    <string name="dialog_progression_body_time_attack">Sie haben die %1$s-Quizze sowie den Excipient Speedrun-Modus für %2$s freigeschaltet!</string>
+    <string name="dialog_progression_tier2">Alternative Namen und Molekültypen</string>
+    <string name="dialog_progression_tier3">Alle</string>
+    <string name="dialog_progression_button">Super!</string>
+
+    <!-- Credits Screen -->
+    <string name="credits_title">Danksagung</string>
+    <string name="credits_body">Diese App wurde von Tom Konings entwickelt, wurde aber vom \"Aminosäure-Quiz\" und dem funktionellen Gruppen-Quiz inspiriert. Google Gemini wurde für den größten Teil der Codierung verwendet, aber die Enzyklopädie wurde mit Hilfe von Experten und insbesondere Guy Van den Mooter geschrieben.</string>
+
+    <!-- Common -->
+    <string name="common_back">Zurück</string>
+    <string name="common_locked">Gesperrt</string>
+
+</resources>
