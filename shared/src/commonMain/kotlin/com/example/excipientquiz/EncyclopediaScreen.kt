@@ -17,9 +17,10 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
@@ -111,15 +112,21 @@ fun EncyclopediaScreen(
             modifier = Modifier.padding(innerPadding).padding(horizontal = 16.dp)
         ) {
             if (showFilter) {
-                Box(modifier = Modifier.fillMaxWidth()) {
+                ExposedDropdownMenuBox(
+                    expanded = isFilterMenuExpanded,
+                    onExpandedChange = { isFilterMenuExpanded = it },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
                     TextField(
                         value = selectedFunction,
                         onValueChange = {},
                         readOnly = true,
                         label = { Text("Filter by Function") },
-                        modifier = Modifier.fillMaxWidth()
+                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = isFilterMenuExpanded) },
+                        colors = ExposedDropdownMenuDefaults.textFieldColors(),
+                        modifier = Modifier.menuAnchor().fillMaxWidth()
                     )
-                    DropdownMenu(
+                    ExposedDropdownMenu(
                         expanded = isFilterMenuExpanded,
                         onDismissRequest = { isFilterMenuExpanded = false }
                     ) {

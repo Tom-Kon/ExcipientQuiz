@@ -564,7 +564,7 @@ fun QuestionContent(questionType: PropertyType, answerType: PropertyType, excipi
             PropertyType.NAME -> Text(excipient.name, fontSize = 24.sp, textAlign = TextAlign.Center)
             PropertyType.FUNCTION -> Text(excipient.function, fontSize = 24.sp, textAlign = TextAlign.Center)
             PropertyType.STRUCTURE -> getDrawableResourceByName(excipient.imageRes)?.let {
-                SharedImage(image = it, modifier = Modifier.size(200.dp).fillMaxWidth(), contentScale = ContentScale.Fit)
+                SharedImage(image = it, modifier = Modifier.height(150.dp).fillMaxWidth(), contentScale = ContentScale.Fit)
             }
             PropertyType.ALTERNATIVE_NAME -> Text(excipient.alternativename, fontSize = 24.sp, textAlign = TextAlign.Center)
             PropertyType.MOLECULE_TYPE -> Text(excipient.moleculetype, fontSize = 24.sp, textAlign = TextAlign.Center)
