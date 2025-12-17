@@ -63,6 +63,7 @@ kotlin {
                 implementation(compose.materialIconsExtended)
                 implementation(compose.components.resources)
                 implementation(compose.ui)
+                implementation("io.github.oshai:kotlin-logging:6.0.3")
                 implementation("com.russhwolf:multiplatform-settings:1.1.1")
                 implementation("com.russhwolf:multiplatform-settings-no-arg:1.1.1")
             }
@@ -70,6 +71,7 @@ kotlin {
 
         val androidMain by getting {
             dependencies {
+                implementation("org.slf4j:slf4j-simple:2.0.13") // Compatible SLF4J v2 backend
                 implementation(libs.androidx.core.ktx)           // 1.10.1 from TOML
                 implementation(libs.androidx.activity.compose)   // 1.8.0 from TOML
                 implementation(libs.androidx.appcompat)          // if added to TOML, e.g., 1.6.1

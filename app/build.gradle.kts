@@ -20,6 +20,9 @@ android {
         release {
             isMinifyEnabled = false
         }
+        debug {
+            isMinifyEnabled = false
+        }
     }
 
     buildFeatures {

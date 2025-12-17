@@ -2,13 +2,103 @@ package com.example.excipientquiz
 
 import com.russhwolf.settings.get
 import com.russhwolf.settings.set
+import io.github.oshai.kotlinlogging.KotlinLogging
 
 private val appSettings = createSettings()
+private val logger = KotlinLogging.logger("QuizLogic")
 
 enum class GameMode {
     EXCIPIENT_SPEEDRUN,
     SURVIVAL
 }
+
+data class Question(
+    val questionText: String,
+    val options: List<String>,    val correctAnswer: String,
+    val questionProperty: PropertyType,
+    val answerProperty: PropertyType,
+    val correctExcipient: Excipient // Keep track of the correct excipient for feedback
+)
+
+fun generateQuestion(
+    questionType: PropertyType,
+    answerType: PropertyType,
+    selectedQuizModes: Set<String>,
+    forceCorrectExcipient: Excipient? = null
+): Question {
+
+    // 1. Make a selected excipient pool based on the quiz content selection
+    val availableExcipients = if (selectedQuizModes.contains("All Excipients")) {
+        excipients
+    } else {
+        selectedQuizModes.flatMap { mode -> com.example.excipientquiz.quizModes[mode] ?: emptyList() }.distinct()
+    }
+
+    if (availableExcipients.isEmpty()) {
+        logger.warn { "No questions available for quizModes: $selectedQuizModes. Returning fallback question." }
+        return Question("No questions available for this mode!", listOf("OK"), "OK", questionType, answerType, excipients.first())
+    }
+
+    // 2. Pick the correct excipient. Use the forced one if provided, otherwise pick random.
+    val correctExcipient = forceCorrectExcipient ?: availableExcipients.random()
+    
+    val questionText = getProperty(correctExcipient, questionType)
+    val correctAnswerText = getProperty(correctExcipient, answerType)
+
+    // 3. Find an appropriate distractor pool: filter the excipients selected in 1 so they do not have the same question tag as mentioned in step 2.
+    // "Question tag" here refers to the property value being asked (e.g., if Question is Function, tag is "Preservative").
+    val distractorPool = availableExcipients.filter { excipient ->
+        getProperty(excipient, questionType) != questionText
+    }
+
+    // Pick 3 random distractors from the filtered pool.
+    // We also ensure the answer text is unique and not equal to the correct answer to avoid duplicate buttons.
+    val distractorTexts = distractorPool
+        .map { getProperty(it, answerType) }
+        .distinct()
+        .filter { it != correctAnswerText }
+        .shuffled()
+        .take(3)
+
+    // Combine and shuffle options
+    val options = (distractorTexts + correctAnswerText).shuffled()
+
+    // --- DEBUGGING WITH THE LOGGER ---
+    logger.info { "--- NEW QUESTION ---" }
+    logger.info { "Question: '$questionText' | Correct Answer: '$correctAnswerText'" }
+    logger.info { "Selected Modes: $selectedQuizModes | Pool Size: ${availableExcipients.size}" }
+    logger.info { "Distractor Pool Size (after filtering same Q tag): ${distractorPool.size}" }
+    logger.info { "Final Options: $options" }
+    logger.info { "--------------------" }
+    // --- END DEBUGGING ---
+
+    return Question(
+        questionText = questionText,
+        options = options,
+        correctAnswer = correctAnswerText,
+        questionProperty = questionType,
+        answerProperty = answerType,
+        correctExcipient = correctExcipient
+    )
+}
+
+
+fun getProperty(excipient: Excipient, propertyType: PropertyType): String {
+    return when (propertyType) {
+        PropertyType.NAME -> excipient.name
+        PropertyType.STRUCTURE -> excipient.imageRes
+        PropertyType.FUNCTION -> excipient.function
+        PropertyType.MOLECULE_TYPE -> excipient.moleculetype
+        PropertyType.ALTERNATIVE_NAME -> excipient.alternativename
+        // Note: The original file did not have USAGE, CHARGE, AQ_SOL, NOTE in the PropertyType enum.
+        // If you need them, you must add them to the enum class first.
+        // PropertyType.USAGE -> excipient.usage
+        // PropertyType.CHARGE -> excipient.charge
+        // PropertyType.AQ_SOL -> excipient.aqsol
+        // PropertyType.NOTE -> excipient.note
+    }
+}
+
 
 enum class MusicType {
     MENU,

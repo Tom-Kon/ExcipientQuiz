@@ -69,13 +69,25 @@ fun ExcipientGameScreen(
     onTierUnlocked: (ProgressionTier, String) -> Unit
 ) {
     val questions = remember(quizModes, questionType, answerType) {
-        quizModes.flatMap { mode -> com.example.excipientquiz.quizModes[mode] ?: emptyList() }
+        // 1. Determine the pool of excipients that are valid for question generation.
+        val possibleExcipients = quizModes
+            .flatMap { mode -> com.example.excipientquiz.quizModes[mode] ?: emptyList() }
             .filter {
                 val qVal = getPropertyValue(it, questionType)
                 val aVal = getPropertyValue(it, answerType)
+                // Ensure both the question property and answer property are valid for this excipient
                 (qVal.isNotBlank() && qVal != "none") && (aVal.isNotBlank() && aVal != "none")
             }
-            .distinct().shuffled()
+            .distinct() // Ensure we have a unique list of Excipient objects
+
+        if (possibleExcipients.isEmpty()) {
+            emptyList<Question>()
+        } else {
+            // 2. Generate exactly one question for EVERY valid excipient.
+            possibleExcipients.map { excipient ->
+                generateQuestion(questionType, answerType, quizModes, forceCorrectExcipient = excipient)
+            }.shuffled()
+        }
     }
 
     var currentIndex by remember { mutableStateOf(0) }
@@ -222,29 +234,14 @@ fun ExcipientGameScreen(
                 ) { targetIndex ->
                     val question = questions.getOrNull(targetIndex)
                     if (question != null) {
-                        val correctAnswer = getPropertyValue(question, answerType)
-                        val options = remember(targetIndex) {
-                            val answerPool = questions.map { getPropertyValue(it, answerType) }.distinct()
-                            val wrongAnswers = answerPool.filter { it != correctAnswer }.shuffled().take(3)
-                            val finalOptions = (wrongAnswers + correctAnswer).shuffled()
-                            if (finalOptions.size < 4) {
-                                val paddingNeeded = 4 - finalOptions.size
-                                val paddingAnswers = excipients.map { getPropertyValue(it, answerType) }
-                                    .filter { it.isNotBlank() && it != "none" && it !in finalOptions }
-                                    .distinct()
-                                    .shuffled()
-                                    .take(paddingNeeded)
-                                (finalOptions + paddingAnswers).shuffled()
-                            } else {
-                                finalOptions
-                            }
-                        }
+                        val correctAnswer = question.correctAnswer
+                        val options = question.options
 
                         Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 32.dp)) {
-                            QuestionContent(questionType, answerType, question)
+                            QuestionContent(question.questionProperty, question.answerProperty, question.questionText)
                             Spacer(modifier = Modifier.height(32.dp))
                             AnswerContent(
-                                answerType = answerType,
+                                answerType = question.answerProperty,
                                 options = options,
                                 correctAnswer = correctAnswer,
                                 isAnswered = isQuestionAnswered,
@@ -548,7 +545,7 @@ private fun getDrawableResourceByName(name: String): DrawableResource? {
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable
-fun QuestionContent(questionType: PropertyType, answerType: PropertyType, excipient: Excipient) {
+fun QuestionContent(questionType: PropertyType, answerType: PropertyType, questionText: String) {
     Column(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -561,13 +558,10 @@ fun QuestionContent(questionType: PropertyType, answerType: PropertyType, excipi
         )
 
         when (questionType) {
-            PropertyType.NAME -> Text(excipient.name, fontSize = 24.sp, textAlign = TextAlign.Center)
-            PropertyType.FUNCTION -> Text(excipient.function, fontSize = 24.sp, textAlign = TextAlign.Center)
-            PropertyType.STRUCTURE -> getDrawableResourceByName(excipient.imageRes)?.let {
+            PropertyType.STRUCTURE -> getDrawableResourceByName(questionText)?.let {
                 SharedImage(image = it, modifier = Modifier.height(150.dp).fillMaxWidth(), contentScale = ContentScale.Fit)
             }
-            PropertyType.ALTERNATIVE_NAME -> Text(excipient.alternativename, fontSize = 24.sp, textAlign = TextAlign.Center)
-            PropertyType.MOLECULE_TYPE -> Text(excipient.moleculetype, fontSize = 24.sp, textAlign = TextAlign.Center)
+            else -> Text(questionText, fontSize = 24.sp, textAlign = TextAlign.Center)
         }
     }
 }
