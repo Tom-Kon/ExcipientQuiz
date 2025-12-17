@@ -2,7 +2,8 @@ package com.example.excipientquiz
 
 actual object AchievementManager {
     actual fun isAchievementUnlocked(achievementId: String): Boolean {
-        return Achievement.valueOf(achievementId).isUnlocked()
+        // Implement logic to check if an achievement is unlocked in JS
+        return false
     }
 
     actual fun recordCompletionAndCheckForNewAchievements(
@@ -15,13 +16,11 @@ actual object AchievementManager {
         time: Long,
         questionCount: Int
     ): List<Achievement> {
-        val unlocked = Achievement.values().filter { ach ->
-            !ach.isUnlocked() && ach.check(score, time, wasSuccessful, questionCount, gameMode, questionType, answerType, quizModes)
+        if (ProgressionManager.isPermanentlyDisabled(questionType, answerType)) {
+            return emptyList()
         }
-        if (unlocked.isNotEmpty()) {
-            unlocked.forEach { it.unlock() }
-        }
-        return unlocked
+        // Implement achievement checking logic for JS
+        return emptyList()
     }
 
     actual fun getAllAchievements(): List<Achievement> {

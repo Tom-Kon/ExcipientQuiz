@@ -87,7 +87,18 @@ actual object ProgressionManager {
         }
     }
 
+    actual fun isPermanentlyDisabled(qType: PropertyType, aType: PropertyType): Boolean {
+        val props = setOf(qType, aType)
+        return when {
+            props == setOf(PropertyType.MOLECULE_TYPE, PropertyType.STRUCTURE) -> true
+            props == setOf(PropertyType.MOLECULE_TYPE, PropertyType.ALTERNATIVE_NAME) -> true
+            props == setOf(PropertyType.MOLECULE_TYPE, PropertyType.FUNCTION) -> true
+            else -> false
+        }
+    }
+
     actual fun isPlayable(quizModes: Set<String>, qType: PropertyType, aType: PropertyType, gameMode: GameMode): Boolean {
+        if (isPermanentlyDisabled(qType, aType)) return false
         if (qType == aType) return false
         if (gameMode == GameMode.EXCIPIENT_SPEEDRUN && !isTimeAttackUnlocked(qType, aType)) return false
 

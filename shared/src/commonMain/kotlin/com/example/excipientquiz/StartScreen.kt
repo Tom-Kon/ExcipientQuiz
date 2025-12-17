@@ -62,7 +62,8 @@ fun ExcipientGameStartScreen(
 ) {
     val propertyTypes = PropertyType.values()
 
-    val isPairValid = questionType != answerType
+    val isPermanentlyDisabled = ProgressionManager.isPermanentlyDisabled(questionType, answerType)
+    val isPairValid = questionType != answerType && !isPermanentlyDisabled
     val isPlayableSurvival = ProgressionManager.isPlayable(selectedQuizModes, questionType, answerType, GameMode.SURVIVAL)
     val isPlayableTimeAttack = ProgressionManager.isPlayable(selectedQuizModes, questionType, answerType, GameMode.EXCIPIENT_SPEEDRUN)
 
@@ -87,7 +88,7 @@ fun ExcipientGameStartScreen(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            HighScore(questionType, answerType, selectedQuizModes)
+            HighScore(questionType, answerType, selectedQuizModes, isPermanentlyDisabled)
             IconButton(onClick = onShowSettings) {
                 Icon(painterResource(Res.drawable.ic_settings), "Settings")
             }
@@ -151,14 +152,19 @@ fun ExcipientGameStartScreen(
 }
 
 @Composable
-fun HighScore(questionType: PropertyType, answerType: PropertyType, selectedQuizModes: Set<String>) {
+fun HighScore(questionType: PropertyType, answerType: PropertyType, selectedQuizModes: Set<String>, isPermanentlyDisabled: Boolean) {
+    if (isPermanentlyDisabled) {
+        Text("This game mode is not playable", style = MaterialTheme.typography.bodyMedium)
+        return
+    }
+
     val quizModeKey = if (selectedQuizModes.size > 1) "all" else selectedQuizModes.first()
     val survivalHighScore = ProgressionManager.getHighScore("highscore_SURVIVAL_${quizModeKey}_${questionType}_$answerType")
     val timeAttackHighScoreString = ProgressionManager.getHighScoreString("highscore_EXCIPIENT_SPEEDRUN_${quizModeKey}_${questionType}_$answerType")
 
     Column {
         if (survivalHighScore > 0) {
-            Text("Survival Record: $survivalHighScore", modifier = Modifier.padding(bottom = 4.dp)) // TODO: replace with string resource
+            Text("Survival Record: $survivalHighScore", modifier = Modifier.padding(bottom = 4.dp))
         }
         if (timeAttackHighScoreString.isNotBlank()) {
             val parts = timeAttackHighScoreString.split("/")

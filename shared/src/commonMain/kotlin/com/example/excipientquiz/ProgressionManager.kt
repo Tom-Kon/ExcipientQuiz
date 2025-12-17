@@ -15,6 +15,8 @@ expect object ProgressionManager {
 
     fun isPlayable(quizModes: Set<String>, qType: PropertyType, aType: PropertyType, gameMode: GameMode): Boolean
 
+    fun isPermanentlyDisabled(qType: PropertyType, aType: PropertyType): Boolean
+
     fun isSpecialModeUnlocked(modeId: String): Boolean
 
     fun unlockTimeAttack(qType: PropertyType, aType: PropertyType)

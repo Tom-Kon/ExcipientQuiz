@@ -45,20 +45,30 @@ fun generateQuestion(
     val questionText = getProperty(correctExcipient, questionType)
     val correctAnswerText = getProperty(correctExcipient, answerType)
 
-    // 3. Find an appropriate distractor pool: filter the excipients selected in 1 so they do not have the same question tag as mentioned in step 2.
-    // "Question tag" here refers to the property value being asked (e.g., if Question is Function, tag is "Preservative").
-    val distractorPool = availableExcipients.filter { excipient ->
-        getProperty(excipient, questionType) != questionText
-    }
+    val distractorTexts: List<String>
 
-    // Pick 3 random distractors from the filtered pool.
-    // We also ensure the answer text is unique and not equal to the correct answer to avoid duplicate buttons.
-    val distractorTexts = distractorPool
-        .map { getProperty(it, answerType) }
-        .distinct()
-        .filter { it != correctAnswerText }
-        .shuffled()
-        .take(3)
+    if (answerType == PropertyType.MOLECULE_TYPE) {
+        // Special case for Molecule Type: Always use the fixed set of options.
+        val allMoleculeTypes = listOf("Polymer", "Small organic molecule", "Inorganic molecule")
+        distractorTexts = allMoleculeTypes.filter { it != correctAnswerText }
+    } else {
+        // 3. Find an appropriate distractor pool: filter the excipients selected in 1 so they do not have the same question tag as mentioned in step 2.
+        // "Question tag" here refers to the property value being asked (e.g., if Question is Function, tag is "Preservative").
+        val distractorPool = availableExcipients.filter { excipient ->
+            getProperty(excipient, questionType) != questionText
+        }
+
+        // Pick 3 random distractors from the filtered pool.
+        // We also ensure the answer text is unique and not equal to the correct answer to avoid duplicate buttons.
+        // We also explicitly filter out "none" or blank answers so they don't appear as distractors.
+        distractorTexts = distractorPool
+            .map { getProperty(it, answerType) }
+            .filter { it.isNotBlank() && !it.equals("none", ignoreCase = true) }
+            .distinct()
+            .filter { it != correctAnswerText }
+            .shuffled()
+            .take(3)
+    }
 
     // Combine and shuffle options
     val options = (distractorTexts + correctAnswerText).shuffled()
@@ -67,7 +77,6 @@ fun generateQuestion(
     logger.info { "--- NEW QUESTION ---" }
     logger.info { "Question: '$questionText' | Correct Answer: '$correctAnswerText'" }
     logger.info { "Selected Modes: $selectedQuizModes | Pool Size: ${availableExcipients.size}" }
-    logger.info { "Distractor Pool Size (after filtering same Q tag): ${distractorPool.size}" }
     logger.info { "Final Options: $options" }
     logger.info { "--------------------" }
     // --- END DEBUGGING ---

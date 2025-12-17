@@ -22,6 +22,10 @@ actual object AchievementManager {
         time: Long,
         questionCount: Int
     ): List<Achievement> {
+        if (ProgressionManager.isPermanentlyDisabled(questionType, answerType)) {
+            return emptyList()
+        }
+
         val unlocked = Achievement.values().filter { ach ->
             !ach.isUnlocked() && ach.check(score, time, wasSuccessful, questionCount, gameMode, questionType, answerType, quizModes)
         }
