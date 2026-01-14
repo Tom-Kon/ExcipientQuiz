@@ -32,39 +32,25 @@ import excipientquiz.shared.generated.resources.Res
 import excipientquiz.shared.generated.resources.common_back
 import excipientquiz.shared.generated.resources.settings_button_credits
 import excipientquiz.shared.generated.resources.settings_language
-import excipientquiz.shared.generated.resources.settings_language_de
-import excipientquiz.shared.generated.resources.settings_language_en
-import excipientquiz.shared.generated.resources.settings_language_fr
-import excipientquiz.shared.generated.resources.settings_language_nl
 import excipientquiz.shared.generated.resources.settings_music
 import excipientquiz.shared.generated.resources.settings_sfx
 import excipientquiz.shared.generated.resources.settings_show_tutorial
 import excipientquiz.shared.generated.resources.settings_title
-import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
-
-private data class LanguageOption(val code: String, val nameRes: StringResource)
-
-private val languages = listOf(
-    LanguageOption("en", Res.string.settings_language_en),
-    LanguageOption("nl", Res.string.settings_language_nl),
-    LanguageOption("fr", Res.string.settings_language_fr),
-    LanguageOption("de", Res.string.settings_language_de)
-)
 
 @Composable
 fun SettingsScreen(
     onBack: () -> Unit,
     onShowTutorial: () -> Unit,
     onShowCredits: () -> Unit,
-    updateLanguage: (String) -> Unit // <-- 1. ADD THIS PARAMETER
+    updateLanguage: (String) -> Unit
 ) {
     val musicEnabled = remember { mutableStateOf(SettingsManager.isMusicEnabled()) }
     val sfxEnabled = remember { mutableStateOf(SettingsManager.isSfxEnabled()) }
     var languageMenuExpanded by remember { mutableStateOf(false) }
 
-    // This gets the current language from the CompositionLocal, which is provided in App.kt
-    val currentLanguageCode = LocalLocale.current.language
+    val availableLanguages = LanguageManager.getLanguages()
+    var currentLanguageCode by remember { mutableStateOf(LanguageManager.getCurrentLanguageCode()) }
 
     var showResetDialog by remember { mutableStateOf(false) }
 
@@ -111,39 +97,37 @@ fun SettingsScreen(
             sfxEnabled.value = it
             SettingsManager.setSfxEnabled(it)
         }
-        Spacer(modifier = Modifier.height(24.dp))
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(stringResource(Res.string.settings_language), style = MaterialTheme.typography.bodyLarge)
-            Box(modifier = Modifier.wrapContentSize(Alignment.TopStart)) {
-                TextButton(onClick = { languageMenuExpanded = true }) {
-                    val currentLanguage = languages.find { it.code == currentLanguageCode } ?: languages.first()
-                    Text(stringResource(currentLanguage.nameRes))
-                }
-                DropdownMenu(
-                    expanded = languageMenuExpanded,
-                    onDismissRequest = { languageMenuExpanded = false }
-                ) {
-                    languages.forEach { lang ->
-                        DropdownMenuItem(
-                            text = { Text(stringResource(lang.nameRes)) },
-                            onClick = {
-                                // --- 2. THIS IS THE LOGIC CHANGE ---
-                                val newLanguage = lang.code
-                                // First, save the setting so it persists
-                                SettingsManager.setLanguage(newLanguage)
-                                // Second, call the function to update the UI state in App.kt
-                                updateLanguage(newLanguage)
-                                // Third, trigger the platform-specific action (like Activity recreation)
-                                setLocale(newLanguage)
-
-                                languageMenuExpanded = false
-                            }
-                        )
+        
+        if (availableLanguages.size > 1) {
+            Spacer(modifier = Modifier.height(24.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(stringResource(Res.string.settings_language), style = MaterialTheme.typography.bodyLarge)
+                Box(modifier = Modifier.wrapContentSize(Alignment.TopStart)) {
+                    TextButton(onClick = { languageMenuExpanded = true }) {
+                        val currentLanguage = availableLanguages.find { it.code == currentLanguageCode } ?: availableLanguages.first()
+                        Text("${currentLanguage.flagEmoji} ${stringResource(currentLanguage.nameRes)}")
+                    }
+                    DropdownMenu(
+                        expanded = languageMenuExpanded,
+                        onDismissRequest = { languageMenuExpanded = false }
+                    ) {
+                        availableLanguages.forEach { lang ->
+                            DropdownMenuItem(
+                                text = { Text("${lang.flagEmoji} ${stringResource(lang.nameRes)}") },
+                                onClick = {
+                                    val newLanguage = lang.code
+                                    SettingsManager.setLanguage(newLanguage)
+                                    currentLanguageCode = newLanguage
+                                    updateLanguage(newLanguage)
+                                    LanguageManager.applyLanguage(newLanguage)
+                                    languageMenuExpanded = false
+                                }
+                            )
+                        }
                     }
                 }
             }

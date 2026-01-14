@@ -38,6 +38,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -68,40 +69,50 @@ fun ExcipientGameScreen(
     onNewAchievements: (List<Achievement>) -> Unit,
     onTierUnlocked: (ProgressionTier, String) -> Unit
 ) {
-    val questions = remember(quizModes, questionType, answerType) {
-        // 1. Determine the pool of excipients that are valid for question generation.
+    val initialQuestions = remember(quizModes, questionType, answerType) {
         val possibleExcipients = quizModes
             .flatMap { mode -> com.example.excipientquiz.quizModes[mode] ?: emptyList() }
             .filter {
                 val qVal = getPropertyValue(it, questionType)
                 val aVal = getPropertyValue(it, answerType)
-                // Ensure both the question property and answer property are valid for this excipient
                 (qVal.isNotBlank() && qVal != "none") && (aVal.isNotBlank() && aVal != "none")
             }
-            .distinct() // Ensure we have a unique list of Excipient objects
+            .distinct()
 
         if (possibleExcipients.isEmpty()) {
             emptyList<Question>()
         } else {
-            // 2. Generate exactly one question for EVERY valid excipient.
             possibleExcipients.map { excipient ->
                 generateQuestion(questionType, answerType, quizModes, forceCorrectExcipient = excipient)
             }.shuffled()
         }
     }
 
-    var currentIndex by remember { mutableStateOf(0) }
-    var score by remember { mutableStateOf(0) }
-    var lives by remember { mutableStateOf(3) }
-    var elapsedTime by remember { mutableStateOf(0L) }
-    var showResult by remember { mutableStateOf(false) }
+    val questions = remember(initialQuestions) { mutableStateListOf<Question>().apply { addAll(initialQuestions) } }
+
+    var currentIndex by remember(initialQuestions) { mutableStateOf(0) }
+    var score by remember(initialQuestions) { mutableStateOf(0) }
+    
+    val initialLives = remember(initialQuestions) { (initialQuestions.size + 5) / 10 + 1 }
+    var lives by remember(initialQuestions) { mutableStateOf(initialLives) }
+    
+    var elapsedTime by remember(initialQuestions) { mutableStateOf(0L) }
+    var showResult by remember(initialQuestions) { mutableStateOf(false) }
     var selectedAnswer by remember { mutableStateOf<String?>(null) }
     var isQuestionAnswered by remember { mutableStateOf(false) }
     var isAnswerCorrect by remember { mutableStateOf(false) }
-    var mistakes by remember { mutableStateOf(0) }
+    var mistakes by remember(initialQuestions) { mutableStateOf(0) }
     var newlyUnlockedAchievements by remember { mutableStateOf<List<Achievement>>(emptyList()) }
     var newlyUnlockedTierInfo by remember { mutableStateOf<Pair<ProgressionTier, String>?>(null) }
-    var survivalTimer by remember { mutableStateOf(15) }
+    var survivalTimer by remember { mutableStateOf(25) }
+    val wrongAnswers = remember { mutableStateListOf<String>() }
+
+    // --- SFX STABILIZATION ---
+    LaunchedEffect(currentIndex) {
+        if (currentIndex > 0) {
+            SoundManager.playSound(SoundEffect.WHOOSH)
+        }
+    }
 
     if (gameMode == GameMode.EXCIPIENT_SPEEDRUN && !showResult) {
         LaunchedEffect(Unit) {
@@ -114,7 +125,7 @@ fun ExcipientGameScreen(
 
     if (gameMode == GameMode.SURVIVAL && !showResult && !isQuestionAnswered) {
         LaunchedEffect(currentIndex) {
-            survivalTimer = 15
+            survivalTimer = 25
             while (survivalTimer > 0) {
                 delay(1000)
                 if (!isQuestionAnswered) {
@@ -126,6 +137,7 @@ fun ExcipientGameScreen(
                 lives--
                 isQuestionAnswered = true
                 isAnswerCorrect = false
+                SoundManager.playSound(SoundEffect.FAIL)
             }
         }
     }
@@ -149,7 +161,8 @@ fun ExcipientGameScreen(
             selectedAnswer = null
             isQuestionAnswered = false
             isAnswerCorrect = false
-            survivalTimer = 15
+            survivalTimer = 25
+            wrongAnswers.clear()
         } else {
             showResult = true
         }
@@ -168,19 +181,29 @@ fun ExcipientGameScreen(
     }
 
     Box(modifier = modifier.fillMaxSize()) {
-        if (showResult) {
+        if (showResult && gameMode != GameMode.STUDY) {
             ResultScreen(
                 gameMode = gameMode,
                 questionType = questionType,
                 answerType = answerType,
                 quizModes = quizModes,
                 score = score,
-                questionCount = questions.size,
+                questionCount = initialQuestions.size,
                 elapsedTime = elapsedTime,
                 lives = lives,
                 onGameOver = onGameOver,
                 onNewAchievements = { newlyUnlockedAchievements = it },
                 onTierUnlocked = { tier, mode -> newlyUnlockedTierInfo = tier to mode }
+            )
+        } else if (showResult && gameMode == GameMode.STUDY) {
+            // Special Case for Study Mode: Just show a simple completion dialog or return to start
+            AlertDialog(
+                onDismissRequest = onGameOver,
+                title = { Text("Study Complete!") },
+                text = { Text("You've gone through all the questions in this category. Great job!") },
+                confirmButton = {
+                    Button(onClick = onGameOver) { Text("Finish") }
+                }
             )
         } else {
             Column(
@@ -207,15 +230,19 @@ fun ExcipientGameScreen(
                         } else {
                             Text("", modifier = Modifier.weight(1f)) // Spacer
                         }
-                        Text(stringResource(Res.string.score, score), fontSize = 20.sp)
-                        Spacer(modifier = Modifier.width(16.dp))
+                        
+                        if (gameMode != GameMode.STUDY) {
+                            Text(stringResource(Res.string.score, score), fontSize = 20.sp)
+                            Spacer(modifier = Modifier.width(16.dp))
+                        }
+
                         if (gameMode == GameMode.SURVIVAL) {
                             Text(
                                 text = stringResource(Res.string.timer, survivalTimer),
                                 fontSize = 20.sp,
                                 color = if (survivalTimer <= 3) Color.Red else Color.Unspecified
                             )
-                        } else {
+                        } else if (gameMode == GameMode.EXCIPIENT_SPEEDRUN) {
                             Text(formatTime(elapsedTime), fontSize = 20.sp)
                         }
                     }
@@ -226,7 +253,6 @@ fun ExcipientGameScreen(
                 AnimatedContent(
                     targetState = currentIndex,
                     transitionSpec = {
-                        SoundManager.playSound(SoundEffect.WHOOSH)
                         val direction = if (targetState > initialState) 1 else -1
                         (slideInHorizontally(animationSpec = tween(300), initialOffsetX = { it * direction }) + fadeIn()).togetherWith(slideOutHorizontally(animationSpec = tween(300), targetOffsetX = { -it * direction }) + fadeOut()) using SizeTransform(clip = false)
                     },
@@ -246,19 +272,39 @@ fun ExcipientGameScreen(
                                 correctAnswer = correctAnswer,
                                 isAnswered = isQuestionAnswered,
                                 selectedAnswer = selectedAnswer,
+                                wrongAnswers = wrongAnswers,
+                                gameMode = gameMode,
                                 onAnswerSelected = {
-                                    if (!isQuestionAnswered) {
-                                        isQuestionAnswered = true
+                                    if (gameMode == GameMode.STUDY) {
                                         if (it == correctAnswer) {
+                                            // If mistakes were made, append to the end
+                                            if (wrongAnswers.isNotEmpty()) {
+                                                questions.add(question)
+                                            }
+                                            isQuestionAnswered = true
                                             isAnswerCorrect = true
-                                            score++
+                                            selectedAnswer = it
                                             SoundManager.playSound(SoundEffect.SUCCESS)
                                         } else {
-                                            isAnswerCorrect = false
-                                            mistakes++
-                                            if (gameMode == GameMode.SURVIVAL) lives--
-                                            selectedAnswer = it
-                                            SoundManager.playSound(SoundEffect.FAIL)
+                                            if (!wrongAnswers.contains(it)) {
+                                                wrongAnswers.add(it)
+                                                SoundManager.playSound(SoundEffect.FAIL)
+                                            }
+                                        }
+                                    } else {
+                                        if (!isQuestionAnswered) {
+                                            isQuestionAnswered = true
+                                            if (it == correctAnswer) {
+                                                isAnswerCorrect = true
+                                                score++
+                                                SoundManager.playSound(SoundEffect.SUCCESS)
+                                            } else {
+                                                isAnswerCorrect = false
+                                                mistakes++
+                                                if (gameMode == GameMode.SURVIVAL) lives--
+                                                selectedAnswer = it
+                                                SoundManager.playSound(SoundEffect.FAIL)
+                                            }
                                         }
                                     }
                                 }
@@ -358,7 +404,7 @@ private fun ResultScreen(
                 "-"
             }
 
-        } else { // GameMode.SURVIVAL
+        } else if (gameMode == GameMode.SURVIVAL) {
             val previousHighScore = ProgressionManager.getHighScore(highScoreKey)
             isNewHighScore = score > previousHighScore
             if (isNewHighScore) {
@@ -395,7 +441,7 @@ fun AchievementUnlockedDialog(achievements: List<Achievement>, onDismiss: () -> 
         text = { 
             Column {
                 achievements.forEach { achievement ->
-                    Text(achievement.name, fontWeight = FontWeight.Bold)
+                    Text(achievement.title, fontWeight = FontWeight.Bold)
                     Text(achievement.description)
                     Spacer(modifier = Modifier.height(8.dp))
                 }
@@ -574,6 +620,8 @@ private fun AnswerContent(
     correctAnswer: String,
     isAnswered: Boolean,
     selectedAnswer: String?,
+    wrongAnswers: List<String>,
+    gameMode: GameMode,
     onAnswerSelected: (String) -> Unit
 ) {
     if (answerType == PropertyType.STRUCTURE) {
@@ -587,7 +635,8 @@ private fun AnswerContent(
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
                     for (i in 0..1) {
                         val option = options[i]
-                        val isSelected = selectedAnswer != null && option.equals(selectedAnswer, ignoreCase = true)
+                        val isWrong = wrongAnswers.contains(option)
+                        val isSelected = (selectedAnswer != null && option.equals(selectedAnswer, ignoreCase = true)) || isWrong
                         val isCorrect = option.equals(correctAnswer, ignoreCase = true)
                         ImageTile(
                             modifier = Modifier.size(tileSize),
@@ -603,7 +652,8 @@ private fun AnswerContent(
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
                     for (i in 2..3) {
                         val option = options[i]
-                        val isSelected = selectedAnswer != null && option.equals(selectedAnswer, ignoreCase = true)
+                        val isWrong = wrongAnswers.contains(option)
+                        val isSelected = (selectedAnswer != null && option.equals(selectedAnswer, ignoreCase = true)) || isWrong
                         val isCorrect = option.equals(correctAnswer, ignoreCase = true)
                         ImageTile(
                             modifier = Modifier.size(tileSize),
@@ -620,14 +670,16 @@ private fun AnswerContent(
     } else {
         LazyColumn(modifier = Modifier.fillMaxWidth()) {
             items(options) { option ->
-                val isSelected = selectedAnswer != null && option.equals(selectedAnswer, ignoreCase = true)
+                val isWrong = wrongAnswers.contains(option)
+                val isSelected = (selectedAnswer != null && option.equals(selectedAnswer, ignoreCase = true)) || isWrong
                 val isCorrect = option.equals(correctAnswer, ignoreCase = true)
                 Button(
                     onClick = { onAnswerSelected(option) },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = when {
                             isAnswered && isCorrect -> Color.Green.copy(alpha = 0.5f)
-                            isAnswered && isSelected && !isCorrect -> Color.Red.copy(alpha = 0.5f)
+                            isWrong -> Color.Red.copy(alpha = 0.5f)
+                            !isAnswered && isSelected && !isCorrect -> Color.Red.copy(alpha = 0.5f)
                             else -> MaterialTheme.colorScheme.primary
                         }
                     ),
@@ -656,7 +708,7 @@ fun ImageTile(
         colors = CardDefaults.cardColors(
             containerColor = when {
                 isAnswered && isCorrect -> Color.Green.copy(alpha = 0.5f)
-                isAnswered && isSelected && !isCorrect -> Color.Red.copy(alpha = 0.5f)
+                isSelected && !isCorrect -> Color.Red.copy(alpha = 0.5f)
                 else -> MaterialTheme.colorScheme.surface
             }
         )

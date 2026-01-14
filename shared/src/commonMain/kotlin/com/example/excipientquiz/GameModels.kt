@@ -9,7 +9,8 @@ private val logger = KotlinLogging.logger("QuizLogic")
 
 enum class GameMode {
     EXCIPIENT_SPEEDRUN,
-    SURVIVAL
+    SURVIVAL,
+    STUDY
 }
 
 data class Question(
@@ -99,12 +100,6 @@ fun getProperty(excipient: Excipient, propertyType: PropertyType): String {
         PropertyType.FUNCTION -> excipient.function
         PropertyType.MOLECULE_TYPE -> excipient.moleculetype
         PropertyType.ALTERNATIVE_NAME -> excipient.alternativename
-        // Note: The original file did not have USAGE, CHARGE, AQ_SOL, NOTE in the PropertyType enum.
-        // If you need them, you must add them to the enum class first.
-        // PropertyType.USAGE -> excipient.usage
-        // PropertyType.CHARGE -> excipient.charge
-        // PropertyType.AQ_SOL -> excipient.aqsol
-        // PropertyType.NOTE -> excipient.note
     }
 }
 
@@ -148,98 +143,98 @@ enum class Achievement(
 ) {
     QUICK_THINKER(
         title = "Quick Thinker",
-        description = "Complete a Time Attack game in under 60 seconds",
+        description = "Reach 90% correct answers in the all excipients category with < 3.5s per answer.",
         imageRes = "allachievementtime",
-        checkLogic = { score, time, wasSuccessful, questionCount, gameMode, qType, aType, selectedQuizModes ->
-            gameMode == GameMode.EXCIPIENT_SPEEDRUN && wasSuccessful && time < 60
+        checkLogic = { _, _, wasSuccessful, _, gameMode, _, _, selectedQuizModes ->
+            gameMode == GameMode.EXCIPIENT_SPEEDRUN && wasSuccessful && selectedQuizModes.contains("All Excipients") && ProgressionManager.hasCompletedSpeedrunAchievement("All Excipients")
         }
     ),
     SURVIVAL_EXPERT(
         title = "Survival Expert",
-        description = "Survive for 10 rounds in Survival mode",
+        description = "Survive all possible quizzes in the all excipients category.",
         imageRes = "allachievementsurvival",
-        checkLogic = { score, time, wasSuccessful, questionCount, gameMode, qType, aType, selectedQuizModes ->
-            gameMode == GameMode.SURVIVAL && score >= 10
+        checkLogic = { _, _, wasSuccessful, _, gameMode, _, _, selectedQuizModes ->
+            gameMode == GameMode.SURVIVAL && wasSuccessful && selectedQuizModes.contains("All Excipients") && ProgressionManager.hasCompletedAllSurvivalQuizzes("All Excipients")
         }
     ),
     CREAMS_TIME(
         title = "Creams Connoisseur (Time)",
-        description = "Complete a time attack game in the creams category.",
+        description = "Reach 90% correct answers in the creams category with < 3.5s per answer.",
         imageRes = "creamsachievementtime",
         checkLogic = { _, _, wasSuccessful, _, gameMode, _, _, selectedQuizModes ->
-            gameMode == GameMode.EXCIPIENT_SPEEDRUN && wasSuccessful && selectedQuizModes == setOf("Creams & Emulsions")
+            gameMode == GameMode.EXCIPIENT_SPEEDRUN && wasSuccessful && ProgressionManager.hasCompletedSpeedrunAchievement("Creams & Emulsions")
         }
     ),
     CREAMS_SURVIVAL(
         title = "Creams Connoisseur (Survival)",
-        description = "Survive 10 rounds in a survival game in the creams category.",
+        description = "Survive all possible quizzes in the creams category.",
         imageRes = "creamsachievementsurvival",
-        checkLogic = { score, _, _, _, gameMode, _, _, selectedQuizModes ->
-            gameMode == GameMode.SURVIVAL && score >= 10 && selectedQuizModes == setOf("Creams & Emulsions")
+        checkLogic = { score, _, wasSuccessful, _, gameMode, qType, aType, selectedQuizModes ->
+            gameMode == GameMode.SURVIVAL && wasSuccessful && ProgressionManager.hasCompletedAllSurvivalQuizzes("Creams & Emulsions")
         }
     ),
     LIQUIDS_TIME(
         title = "Liquids Luminary (Time)",
-        description = "Complete a time attack game in the liquids category.",
+        description = "Reach 90% correct answers in the liquids category with < 3.5s per answer.",
         imageRes = "liquidsachievementtime",
         checkLogic = { _, _, wasSuccessful, _, gameMode, _, _, selectedQuizModes ->
-            gameMode == GameMode.EXCIPIENT_SPEEDRUN && wasSuccessful && selectedQuizModes == setOf("Parenterals & Liquids")
+            gameMode == GameMode.EXCIPIENT_SPEEDRUN && wasSuccessful && ProgressionManager.hasCompletedSpeedrunAchievement("Parenterals & Liquids")
         }
     ),
     LIQUIDS_SURVIVAL(
         title = "Liquids Luminary (Survival)",
-        description = "Survive 10 rounds in a survival game in the liquids category.",
+        description = "Survive all possible quizzes in the liquids category.",
         imageRes = "liquidsachievementsurvival",
-        checkLogic = { score, _, _, _, gameMode, _, _, selectedQuizModes ->
-            gameMode == GameMode.SURVIVAL && score >= 10 && selectedQuizModes == setOf("Parenterals & Liquids")
+        checkLogic = { score, _, wasSuccessful, _, gameMode, qType, aType, selectedQuizModes ->
+            gameMode == GameMode.SURVIVAL && wasSuccessful && ProgressionManager.hasCompletedAllSurvivalQuizzes("Parenterals & Liquids")
         }
     ),
     SOLID_DOSAGE_TIME(
         title = "Solid Strategist (Time)",
-        description = "Complete a time attack game in the solid dosage category.",
+        description = "Reach 90% correct answers in the solid dosage category with < 3.5s per answer.",
         imageRes = "soliddosageachievementtime",
         checkLogic = { _, _, wasSuccessful, _, gameMode, _, _, selectedQuizModes ->
-            gameMode == GameMode.EXCIPIENT_SPEEDRUN && wasSuccessful && selectedQuizModes == setOf("Solid dosage forms")
+            gameMode == GameMode.EXCIPIENT_SPEEDRUN && wasSuccessful && ProgressionManager.hasCompletedSpeedrunAchievement("Solid dosage forms")
         }
     ),
     SOLID_DOSAGE_SURVIVAL(
         title = "Solid Strategist (Survival)",
-        description = "Survive 10 rounds in a survival game in the solid dosage category.",
+        description = "Survive all possible quizzes in the solid dosage category.",
         imageRes = "soliddosageachievementsurvival",
-        checkLogic = { score, _, _, _, gameMode, _, _, selectedQuizModes ->
-            gameMode == GameMode.SURVIVAL && score >= 10 && selectedQuizModes == setOf("Solid dosage forms")
+        checkLogic = { score, _, wasSuccessful, _, gameMode, qType, aType, selectedQuizModes ->
+            gameMode == GameMode.SURVIVAL && wasSuccessful && ProgressionManager.hasCompletedAllSurvivalQuizzes("Solid dosage forms")
         }
     ),
     SUSPENSIONS_TIME(
         title = "Suspensions Specialist (Time)",
-        description = "Complete a time attack game in the suspensions category.",
+        description = "Reach 90% correct answers in the suspensions category with < 3.5s per answer.",
         imageRes = "suspensionsachievementtime",
         checkLogic = { _, _, wasSuccessful, _, gameMode, _, _, selectedQuizModes ->
-            gameMode == GameMode.EXCIPIENT_SPEEDRUN && wasSuccessful && selectedQuizModes == setOf("Gels & Suspensions")
+            gameMode == GameMode.EXCIPIENT_SPEEDRUN && wasSuccessful && ProgressionManager.hasCompletedSpeedrunAchievement("Gels & Suspensions")
         }
     ),
     SUSPENSIONS_SURVIVAL(
         title = "Suspensions Specialist (Survival)",
-        description = "Survive 10 rounds in a survival game in the suspensions category.",
+        description = "Survive all possible quizzes in the suspensions category.",
         imageRes = "suspensionsachievementsurvival",
-        checkLogic = { score, _, _, _, gameMode, _, _, selectedQuizModes ->
-            gameMode == GameMode.SURVIVAL && score >= 10 && selectedQuizModes == setOf("Gels & Suspensions")
+        checkLogic = { score, _, wasSuccessful, _, gameMode, qType, aType, selectedQuizModes ->
+            gameMode == GameMode.SURVIVAL && wasSuccessful && ProgressionManager.hasCompletedAllSurvivalQuizzes("Gels & Suspensions")
         }
     ),
     PRESERVATIVES_TIME(
         title = "Preservatives Pro (Time)",
-        description = "Complete a time attack game in the preservatives category.",
+        description = "Reach 90% correct answers in the preservatives category with < 3.5s per answer.",
         imageRes = "preservativesachievementtime",
         checkLogic = { _, _, wasSuccessful, _, gameMode, _, _, selectedQuizModes ->
-            gameMode == GameMode.EXCIPIENT_SPEEDRUN && wasSuccessful && selectedQuizModes == setOf("Preservatives & antioxidants")
+            gameMode == GameMode.EXCIPIENT_SPEEDRUN && wasSuccessful && ProgressionManager.hasCompletedSpeedrunAchievement("Preservatives & antioxidants")
         }
     ),
     PRESERVATIVES_SURVIVAL(
         title = "Preservatives Pro (Survival)",
-        description = "Survive 10 rounds in a survival game in the preservatives category.",
+        description = "Survive all possible quizzes in the preservatives category.",
         imageRes = "preservativesachievementsurvival",
-        checkLogic = { score, _, _, _, gameMode, _, _, selectedQuizModes ->
-            gameMode == GameMode.SURVIVAL && score >= 10 && selectedQuizModes == setOf("Preservatives & antioxidants")
+        checkLogic = { score, _, wasSuccessful, _, gameMode, qType, aType, selectedQuizModes ->
+            gameMode == GameMode.SURVIVAL && wasSuccessful && ProgressionManager.hasCompletedAllSurvivalQuizzes("Preservatives & antioxidants")
         }
     );
 

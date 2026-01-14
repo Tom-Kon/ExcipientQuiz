@@ -36,7 +36,11 @@
     <!-- Game Mode Selection -->
     <string name="gamemode_title">Choose Your Mode</string>
     <string name="gamemode_time_attack">Excipient Speedrun</string>
+    <string name="gamemode_time_attack_desc">Test your excipient knowledge in this quiz mode! How long do you need to reach the end of the quiz? Excellent times without errors will give you extra achievements!</string>
     <string name="gamemode_survival">Survival</string>
+    <string name="gamemode_survival_desc">Try to reach the end of the quiz without loosing all of your lives! Play this mode to unlock new quizzes.</string>
+    <string name="gamemode_study">Study Mode</string>
+    <string name="gamemode_study_desc">Not too sure about the current quiz yet and want to practice without lives or a timer? This is the mode for you!</string>
     <string name="gamemode_button_back">Back</string>
 
     <!-- Game Screen -->
@@ -88,12 +92,12 @@
     <string name="common_locked">Locked</string>
     <string name="no_questions">No questions found for the selected modes.</string>
     <string name="back">Back</string>
-    <string name="score">Score: %1$s</string>
-    <string name="timer">Timer: %1$s</string>
+    <string name="score">Score: %1$d</string>
+    <string name="timer">Timer: %1$d</string>
     <string name="time">Time: %1$s s</string>
     <string name="new_high_score">New high score!</string>
-    <string name="result_score_time_attack">You got %1$s / %2$s correct!</string>
-    <string name="result_score_survival">You got %1$s correct!</string>
+    <string name="result_score_time_attack">You got %1$d / %2$d correct!</string>
+    <string name="result_score_survival">You got %1$d correct!</string>
     <string name="previous_high_score">Previous high score: %1$s</string>
     <string name="achievements_unlocked">Achievements Unlocked!</string>
     <string name="achievement_unlocked">Achievement Unlocked!</string>
@@ -102,4 +106,5 @@
     <string name="unlocked_quizzes_for">You\'ve unlocked the %1$s quizzes for %2$s!</string>
     <string name="great">Great!</string>
     <string name="question_prompt">Which %1$s matches this %2$s?</string>
+    <string name="not_playable">This game mode is not playable</string>
 </resources>

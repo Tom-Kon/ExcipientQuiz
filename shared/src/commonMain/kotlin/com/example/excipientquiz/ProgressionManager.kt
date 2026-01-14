@@ -22,4 +22,16 @@ expect object ProgressionManager {
     fun unlockTimeAttack(qType: PropertyType, aType: PropertyType)
 
     fun isTimeAttackUnlocked(qType: PropertyType, aType: PropertyType): Boolean
+
+    fun recordSurvivalCompletion(quizMode: String, qType: PropertyType, aType: PropertyType)
+
+    fun hasCompletedAllSurvivalQuizzes(quizMode: String): Boolean
+
+    fun getMissingSurvivalPair(quizMode: String): String?
+
+    fun recordSpeedrunResult(quizMode: String, qType: PropertyType, aType: PropertyType, score: Int, time: Long)
+
+    fun hasCompletedSpeedrunAchievement(quizMode: String): Boolean
+
+    fun getSpeedrunRecommendation(quizMode: String): String?
 }

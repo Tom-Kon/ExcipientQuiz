@@ -1,6 +1,13 @@
 package com.example.excipientquiz
 
-import androidx.compose.runtime.compositionLocalOf
+// Inside LocaleProvider.kt
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.text.intl.Locale
 
-val LocalLocale = compositionLocalOf { Locale("en") }
+object LocaleProvider {
+    val current: Locale
+        @Composable
+        @ReadOnlyComposable
+        get() = LocalAppLanguage.current // Use the new unique name here
+}

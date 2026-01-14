@@ -6,28 +6,42 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material3.Text
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.*
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.text.intl.Locale
+import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.resources.ExperimentalResourceApi
+import androidx.compose.runtime.staticCompositionLocalOf
 
+// 1. Definition of your custom LocalLocale for standard Compose components
+val LocalAppLanguage = staticCompositionLocalOf { Locale("en") }
+
+@OptIn(ExperimentalResourceApi::class)
 @Composable
 fun App() {
-    // 1. State holding the current language code
-    var currentLanguageCode by remember { mutableStateOf(SettingsManager.getLanguage()) }
+    // 2. Initialize state from the platform's current language code
+    var currentLanguageCode by remember { mutableStateOf(LanguageManager.getCurrentLanguageCode()) }
 
-    CompositionLocalProvider(LocalLocale provides Locale(currentLanguageCode)) {
-        MaterialTheme {
-            key(currentLanguageCode) { // Force recomposition when language changes
+    // 3. Wrap in CompositionLocalProvider
+    // 3. Wrap in CompositionLocalProvider
+    // 3. Wrap in CompositionLocalProvider
+    // 3. Wrap in CompositionLocalProvider
+    // 3. Wrap in CompositionLocalProvider
+    CompositionLocalProvider(
+        // This provides the Locale for standard Compose UI logic (your custom val)
+        LocalAppLanguage provides Locale(currentLanguageCode))
+
+        // This is the property provided by the JetBrains library.
+        // If it shows red in the IDE, ignore it and run the command in Step 2.
+    { MaterialTheme {
+            key(currentLanguageCode) {
                 AppContent(
                     updateLanguage = { newLanguageCode ->
                         currentLanguageCode = newLanguageCode
@@ -37,6 +51,7 @@ fun App() {
         }
     }
 }
+
 
 @Composable
 fun AppContent(
@@ -55,14 +70,23 @@ fun AppContent(
     var specialModeId by remember { mutableStateOf<String?>(null) }
     var specialModeScore by remember { mutableStateOf(0) }
 
-    LaunchedEffect(Unit) {
-        SoundManager.playMusic(MusicType.MENU)
+    // --- STABILIZED MUSIC LOGIC ---
+    LaunchedEffect(currentScreen, selectedGameMode) {
+        val musicType = when (currentScreen) {
+            "game" -> when (selectedGameMode) {
+                GameMode.EXCIPIENT_SPEEDRUN -> MusicType.EXCIPIENT_SPEEDRUN
+                GameMode.SURVIVAL -> MusicType.SURVIVAL
+                GameMode.STUDY -> MusicType.MENU
+            }
+            "lanette_lingering", "cellulose_connoisseur", "emulsion_types", "stunning_stability" -> MusicType.SURVIVAL
+            else -> MusicType.MENU
+        }
+        SoundManager.playMusic(musicType)
     }
 
     val screenContent: @Composable () -> Unit = {
         when (currentScreen) {
             "start" -> {
-                SoundManager.playMusic(MusicType.MENU)
                 ExcipientGameStartScreen(
                     selectedQuizModes = selectedQuizModes,
                     questionType = selectedQuestionType,
@@ -78,7 +102,6 @@ fun AppContent(
                 )
             }
 
-            // --- SETTINGS SCREEN ---
             "settings" -> SettingsScreen(
                 onBack = { currentScreen = "start" },
                 onShowTutorial = { currentScreen = "tutorial" },
@@ -127,7 +150,6 @@ fun AppContent(
                 }
             )
             "lanette_lingering", "cellulose_connoisseur", "emulsion_types", "stunning_stability" -> {
-                SoundManager.playMusic(MusicType.SURVIVAL)
                 when (currentScreen) {
                     "lanette_lingering" -> LanetteLingeringScreen(onGameOver = { score ->
                         specialModeScore = score
@@ -158,11 +180,6 @@ fun AppContent(
                 ExcipientDetailScreen(excipient = it, onBack = { currentScreen = "encyclopedia" })
             }
             "game" -> {
-                val musicType = when (selectedGameMode) {
-                    GameMode.EXCIPIENT_SPEEDRUN -> MusicType.EXCIPIENT_SPEEDRUN
-                    GameMode.SURVIVAL -> MusicType.SURVIVAL
-                }
-                SoundManager.playMusic(musicType)
                 ExcipientGameScreen(
                     gameMode = selectedGameMode,
                     questionType = selectedQuestionType,
@@ -201,17 +218,7 @@ fun AppContent(
                     x += spacing
                 }
             }
-
-            // The content for the current screen
             screenContent()
-
-            // Debug text to verify current language
-//            val debugLanguageCode = LocalLocale.current.language
-//            Text(
-//                text = "DEBUG: UI LANG IS '$debugLanguageCode'",
-//                color = Color.Red,
-//                modifier = Modifier.align(Alignment.TopStart).padding(8.dp)
-//            )
         }
     }
 }

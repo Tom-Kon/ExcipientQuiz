@@ -81,7 +81,7 @@ fun AchievementCard(achievement: Achievement, isUnlocked: Boolean) {
     Card(
         modifier = Modifier
             .padding(8.dp)
-            .alpha(if (isUnlocked) 1f else 0.25f)
+            .alpha(if (isUnlocked) 1f else 0.4f)
     ) {
         Column(
             modifier = Modifier
@@ -90,7 +90,7 @@ fun AchievementCard(achievement: Achievement, isUnlocked: Boolean) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            getAchievementDrawableResourceByName(achievement.imageRes)?.let { 
+            getAchievementDrawableResourceByName(achievement.imageRes)?.let {
                 Image(painter = painterResource(it), contentDescription = achievement.title, modifier = Modifier.size(96.dp))
             }
             Spacer(modifier = Modifier.height(8.dp))
@@ -98,9 +98,39 @@ fun AchievementCard(achievement: Achievement, isUnlocked: Boolean) {
             Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = achievement.description,
-                style = MaterialTheme.typography.bodySmall, 
+                style = MaterialTheme.typography.bodySmall,
                 textAlign = TextAlign.Center
             )
+
+            // --- HELP TEXT FOR MISSING SURVIVAL PAIRS ---
+            if (!isUnlocked) {
+                val quizMode = when (achievement.name) {
+                    "SOLID_DOSAGE_SURVIVAL", "SOLID_DOSAGE_TIME" -> "Solid dosage forms"
+                    "CREAMS_SURVIVAL", "CREAMS_TIME" -> "Creams & Emulsions"
+                    "LIQUIDS_SURVIVAL", "LIQUIDS_TIME" -> "Parenterals & Liquids"
+                    "SUSPENSIONS_SURVIVAL", "SUSPENSIONS_TIME" -> "Gels & Suspensions"
+                    "PRESERVATIVES_SURVIVAL", "PRESERVATIVES_TIME" -> "Preservatives & antioxidants"
+                    else -> null
+                }
+
+                if (quizMode != null) {
+                    val isSpeedrun = achievement.name.endsWith("_TIME")
+                    val recommendation = if (isSpeedrun) {
+                        ProgressionManager.getSpeedrunRecommendation(quizMode)
+                    } else {
+                        ProgressionManager.getMissingSurvivalPair(quizMode)
+                    }
+
+                    if (recommendation != null) {
+                        Spacer(modifier = Modifier.height(12.dp))
+                        Text(
+                            text = "Recommended: $recommendation",
+                            style = MaterialTheme.typography.bodySmall,
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                }
+            }
         }
     }
 }

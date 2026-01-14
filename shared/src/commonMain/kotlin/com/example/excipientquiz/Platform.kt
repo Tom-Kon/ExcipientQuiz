@@ -1,10 +1,24 @@
 package com.example.excipientquiz
 
+import org.jetbrains.compose.resources.StringResource
+
 expect fun getPlatformName(): String
 
 expect fun setLocale(languageCode: String)
 
 expect fun resetAllUserData()
+
+data class LanguageOption(
+    val code: String,
+    val nameRes: StringResource,
+    val flagEmoji: String
+)
+
+expect object LanguageManager {
+    fun getLanguages(): List<LanguageOption>
+    fun getCurrentLanguageCode(): String
+    fun applyLanguage(languageCode: String)
+}
 
 expect object SettingsManager {
     fun isMusicEnabled(): Boolean
@@ -21,4 +35,5 @@ expect object SoundManager {
     fun playSound(soundEffect: SoundEffect)
     fun playMusic(musicType: MusicType)
     fun stopBackgroundMusic()
+    fun releaseSoundPool()
 }

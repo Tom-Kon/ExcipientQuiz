@@ -26,6 +26,17 @@ actual object AchievementManager {
             return emptyList()
         }
 
+        // Record the results before checking achievements
+        if (wasSuccessful) {
+            quizModes.forEach { mode ->
+                if (gameMode == GameMode.SURVIVAL) {
+                    ProgressionManager.recordSurvivalCompletion(mode, questionType, answerType)
+                } else if (gameMode == GameMode.EXCIPIENT_SPEEDRUN) {
+                    ProgressionManager.recordSpeedrunResult(mode, questionType, answerType, score, time)
+                }
+            }
+        }
+
         val unlocked = Achievement.values().filter { ach ->
             !ach.isUnlocked() && ach.check(score, time, wasSuccessful, questionCount, gameMode, questionType, answerType, quizModes)
         }

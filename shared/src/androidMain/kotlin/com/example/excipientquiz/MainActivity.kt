@@ -10,10 +10,17 @@ import com.example.excipientquiz.ui.theme.ExcipientQuizTheme
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        
+        // 1. Initialize AppContext with this activity reference
         AppContext.initialize(this)
+        
+        // 2. Get the saved language and apply it to the Android configuration
+        // This ensures that string resources loaded by Compose use the correct locale.
+        val savedLanguage = SettingsManager.getLanguage()
+        LanguageManager.applyLanguageInternal(savedLanguage)
+        
         setContent {
             ExcipientQuizTheme {
-                // Call App() instead of AppContent()
                 App()
             }
         }
@@ -24,7 +31,6 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun DefaultPreview() {
     ExcipientQuizTheme {
-        // Call App() instead of AppContent() for the preview as well
         App()
     }
 }

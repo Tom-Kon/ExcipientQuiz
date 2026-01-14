@@ -6,7 +6,7 @@
         android:allowBackup="false"
         android:label="ExcipientQuiz"
         android:supportsRtl="true"
-        android:icon="@android:color/transparent"
+        android:icon="@mipmap/ic_launcher"
         android:theme="@android:style/Theme.Material.Light.NoActionBar"
         tools:replace="android:label,android:allowBackup,android:icon,android:theme">
         <activity
